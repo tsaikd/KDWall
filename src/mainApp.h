@@ -1,0 +1,4 @@
+#ifndef _KDWALL_MAINAPP_H
+#define _KDWALL_MAINAPP_H
+
+#endif//_KDWALL_MAINAPP_H

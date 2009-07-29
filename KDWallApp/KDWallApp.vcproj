@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="big5"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="9.00"
+	Name="KDWallApp"
+	ProjectGUID="{CD101E85-9AB1-449C-8EF7-7A2548E72B58}"
+	RootNamespace="KDWallApp"
+	Keyword="MakeFileProj"
+	TargetFrameworkVersion="196613"
+	>
+	<Platforms>
+		<Platform
+			Name="Win32"
+		/>
+	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
+	<Configurations>
+		<Configuration
+			Name="Debug|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="0"
+			>
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="qmake &amp;&amp; nmake debug"
+				ReBuildCommandLine="qmake &amp;&amp; nmake clean debug debug"
+				CleanCommandLine="nmake clean-debug"
+				Output="KDWallApp.exe"
+				PreprocessorDefinitions="WIN32;_DEBUG"
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="0"
+			>
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="qmake &amp;&amp; nmake debug"
+				ReBuildCommandLine="qmake &amp;&amp; nmake clean debug debug"
+				CleanCommandLine="nmake clean-debug"
+				Output="KDWallApp.exe"
+				PreprocessorDefinitions="WIN32;NDEBUG"
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
+		</Configuration>
+	</Configurations>
+	<References>
+	</References>
+	<Files>
+		<Filter
+			Name="Source Files"
+			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			>
+			<File
+				RelativePath="..\src\mainApp.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\PicFinder.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Util.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\WallMgr.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\WinMainApp.cpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+			>
+			<File
+				RelativePath="..\src\mainApp.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\PicFinder.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\stable.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Util.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\WallMgr.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\WinMainApp.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Resource Files"
+			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+			>
+		</Filter>
+		<File
+			RelativePath=".\KDWallApp.pro"
+			>
+		</File>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>
