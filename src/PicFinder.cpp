@@ -55,7 +55,7 @@ void QPicFinder::findPicInDir()
 		for (int i=0 ; i<fiList.count() ; i++) {
 			const QFileInfo& fi = fiList[i];
 			addPicToDB(fi, sDir);
-			qDebug() << fi.absoluteFilePath();
+			QTRACE() << fi.absoluteFilePath();
 		}
 		emit(dirFoundOver(sDir));
 	}
@@ -74,6 +74,6 @@ void QPicFinder::addPicToDB(const QFileInfo& fi, const QString& sDir)
 	sql.addBindValue(0);
 	sql.addBindValue(0);
 	if (!sql.exec()) {
-		qDebug() << sql.lastError().text();
+		QTRACE() << sql.lastError().text();
 	}
 }

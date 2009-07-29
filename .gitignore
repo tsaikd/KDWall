@@ -1,5 +1,6 @@
 *.pdb
 *.ilk
+*.user
 /KDWall.ncb
 /KDWall.suo
 /KDWallApp/KDWall.db

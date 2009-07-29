@@ -28,7 +28,7 @@
 				ReBuildCommandLine="qmake &amp;&amp; nmake clean debug debug"
 				CleanCommandLine="nmake clean-debug"
 				Output="KDWallAppd.exe"
-				PreprocessorDefinitions="WIN32;_DEBUG"
+				PreprocessorDefinitions="WIN32;_DEBUG;QT_VERSION"
 				IncludeSearchPath=""
 				ForcedIncludes=""
 				AssemblySearchPath=""
@@ -48,7 +48,7 @@
 				ReBuildCommandLine="qmake &amp;&amp; nmake clean debug debug"
 				CleanCommandLine="nmake clean-debug"
 				Output="KDWallApp.exe"
-				PreprocessorDefinitions="WIN32;NDEBUG"
+				PreprocessorDefinitions="WIN32;NDEBUG;QT_VERSION"
 				IncludeSearchPath=""
 				ForcedIncludes=""
 				AssemblySearchPath=""
@@ -65,6 +65,10 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
+			<File
+				RelativePath="..\src\Debug.cpp"
+				>
+			</File>
 			<File
 				RelativePath="..\src\mainApp.cpp"
 				>
@@ -91,6 +95,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\src\Debug.h"
+				>
+			</File>
 			<File
 				RelativePath="..\src\mainApp.h"
 				>

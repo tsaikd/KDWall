@@ -32,6 +32,7 @@ CONFIG(debug, debug|release) {
 
 PRECOMPILED_HEADER += $${BASEDIR}/src/stable.h
 
+SOURCES += $${SRCDIR}/Debug.cpp
 SOURCES += $${SRCDIR}/mainApp.cpp
 HEADERS += $${SRCDIR}/WinMainApp.h
 SOURCES += $${SRCDIR}/WinMainApp.cpp

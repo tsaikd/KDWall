@@ -103,7 +103,7 @@ void QWinMainApp::closeEvent(QCloseEvent* event)
 	QPicFinder*& picfinder = m_picfinder;
 	picfinder->quit();
 	if (!picfinder->wait(10000)) {
-		qDebug() << "PicFinder wait timeout";
+		QTRACE() << "PicFinder wait timeout";
 		picfinder->exit(1);
 	}
 
