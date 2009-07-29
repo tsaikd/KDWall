@@ -2,6 +2,7 @@
 
 #include "WallMgr.h"
 #include "PicFinder.h"
+#include "TreePicDir.h"
 
 enum TREE_PICDIR_COLUMN {
 	TREE_PICDIR_COLUMN_PATH,
@@ -32,13 +33,14 @@ void QWinMainApp::_init()
 	{
 		QHBoxLayout* lot2 = new QHBoxLayout();
 		{
-			QTreeWidget*& tree = m_treePicDir;
-			tree = new QTreeWidget(this);
+			QTreePicDir*& tree = m_treePicDir;
+			tree = new QTreePicDir(this);
 			tree->setRootIsDecorated(false);
 			QStringList headers;
 			headers << tr("Path");
 			headers << tr("Count");
 			tree->setHeaderLabels(headers);
+			connect(tree, SIGNAL(dropUrls(QList<QUrl>&)), this, SLOT(addUrlsToTree(QList<QUrl>&)));
 			lot2->addWidget(tree);
 		}
 		{
@@ -110,13 +112,9 @@ void QWinMainApp::closeEvent(QCloseEvent* event)
 	QWidget::closeEvent(event);
 }
 
-void QWinMainApp::choiceDirAddToTree()
+void QWinMainApp::addDirToTree(const QString& sDir)
 {
-	const QString& sDir = QFileDialog::getExistingDirectory(this, tr("Add picture directory"));
-	if (sDir.isEmpty() || !QFile::exists(sDir))
-		return;
-
-	QTreeWidget*& tree = m_treePicDir;
+	QTreePicDir*& tree = m_treePicDir;
 	QTreeWidgetItem* item = new QTreeWidgetItem();
 	item->setText(TREE_PICDIR_COLUMN_PATH, sDir);
 	item->setText(TREE_PICDIR_COLUMN_PICCOUNT, "0");
@@ -126,9 +124,28 @@ void QWinMainApp::choiceDirAddToTree()
 	picfinder->addPicDir(sDir);
 }
 
+void QWinMainApp::addUrlsToTree(QList<QUrl>& urls)
+{
+	for (int i=0 ; i<urls.count() ; i++) {
+		QFileInfo fi(urls[i].toLocalFile());
+		if (fi.isDir()) {
+			addDirToTree(fi.absoluteFilePath());
+		}
+	}
+}
+
+void QWinMainApp::choiceDirAddToTree()
+{
+	const QString& sDir = QFileDialog::getExistingDirectory(this, tr("Add picture directory"));
+	if (sDir.isEmpty() || !QFile::exists(sDir))
+		return;
+
+	addDirToTree(sDir);
+}
+
 void QWinMainApp::removeCurDirFromTree()
 {
-	QTreeWidget*& tree = m_treePicDir;
+	QTreePicDir*& tree = m_treePicDir;
 	QList<QTreeWidgetItem*> list = tree->selectedItems();
 	QTreeWidgetItem* item;
 	int i;
@@ -142,7 +159,7 @@ void QWinMainApp::removeCurDirFromTree()
 
 void QWinMainApp::updateTreePicCount(const QString& sDir)
 {
-	QTreeWidget*& tree = m_treePicDir;
+	QTreePicDir*& tree = m_treePicDir;
 	QList<QTreeWidgetItem*> list = tree->findItems(sDir, Qt::MatchExactly, TREE_PICDIR_COLUMN_PATH);
 	QTreeWidgetItem* item;
 	QString count;

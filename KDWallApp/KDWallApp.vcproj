@@ -78,6 +78,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\TreePicDir.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Util.cpp"
 				>
 			</File>
@@ -109,6 +113,10 @@
 			</File>
 			<File
 				RelativePath="..\src\stable.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\TreePicDir.h"
 				>
 			</File>
 			<File

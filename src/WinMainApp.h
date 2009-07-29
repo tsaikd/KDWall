@@ -5,6 +5,7 @@
 
 class QWallMgr;
 class QPicFinder;
+class QTreePicDir;
 
 class QWinMainApp : public QWidget
 {
@@ -17,7 +18,10 @@ public:
 protected:
 	virtual void closeEvent(QCloseEvent* event);
 
+	void addDirToTree(const QString& sDir);
+
 protected slots:
+	void addUrlsToTree(QList<QUrl>& urls);
 	void choiceDirAddToTree();
 	void removeCurDirFromTree();
 	void updateTreePicCount(const QString& sDir);
@@ -27,7 +31,7 @@ protected:
 	QPicFinder* m_picfinder;
 
 	QComboBox* m_cboProfile;
-	QTreeWidget* m_treePicDir;
+	QTreePicDir* m_treePicDir;
 };
 
 #endif//_KDWALL_WINMAINAPP_H

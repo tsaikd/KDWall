@@ -46,17 +46,31 @@ void QPicFinder::findPicInDir()
 	QMutexLocker locker(&m_mutex);
 	QStringList& dirNameFilters = m_dirNameFilters;
 	QStringList& dirList = m_dirList;
+	int i;
 
 	while (!dirList.isEmpty()) {
+		QList<QDir> dirs;
 		const QString& sDir = dirList.takeFirst();
-		QDir dir(sDir);
-		dir.setNameFilters(dirNameFilters);
-		const QFileInfoList& fiList = dir.entryInfoList(QDir::Dirs|QDir::Files|QDir::NoDotAndDotDot);
-		for (int i=0 ; i<fiList.count() ; i++) {
-			const QFileInfo& fi = fiList[i];
-			addPicToDB(fi, sDir);
-			QTRACE() << fi.absoluteFilePath();
+		dirs.append(QDir(sDir));
+		while (!dirs.isEmpty()) {
+			QDir& dir = dirs.takeFirst();
+
+			const QFileInfoList& fiDirList = dir.entryInfoList(QDir::Dirs|QDir::NoDotAndDotDot);
+			for (i=0 ; i<fiDirList.count() ; i++) {
+				const QFileInfo& fi = fiDirList[i];
+				dirs.append(QDir(fi.absoluteFilePath()));
+				QTRACE() << "DIR" << fi.absoluteFilePath();
+			}
+
+			dir.setNameFilters(dirNameFilters);
+			const QFileInfoList& fiList = dir.entryInfoList(QDir::Files);
+			for (i=0 ; i<fiList.count() ; i++) {
+				const QFileInfo& fi = fiList[i];
+				addPicToDB(fi, sDir);
+				QTRACE() << fi.absoluteFilePath();
+			}
 		}
+
 		emit(dirFoundOver(sDir));
 	}
 }

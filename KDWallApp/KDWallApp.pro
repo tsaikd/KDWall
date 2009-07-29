@@ -40,3 +40,5 @@ SOURCES += $${SRCDIR}/Util.cpp
 SOURCES += $${SRCDIR}/WallMgr.cpp
 HEADERS += $${SRCDIR}/PicFinder.h
 SOURCES += $${SRCDIR}/PicFinder.cpp
+HEADERS += $${SRCDIR}/TreePicDir.h
+SOURCES += $${SRCDIR}/TreePicDir.cpp
