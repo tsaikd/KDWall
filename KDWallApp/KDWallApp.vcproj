@@ -27,7 +27,7 @@
 				BuildCommandLine="qmake &amp;&amp; nmake debug"
 				ReBuildCommandLine="qmake &amp;&amp; nmake clean debug debug"
 				CleanCommandLine="nmake clean-debug"
-				Output="KDWallApp.exe"
+				Output="KDWallAppd.exe"
 				PreprocessorDefinitions="WIN32;_DEBUG"
 				IncludeSearchPath=""
 				ForcedIncludes=""

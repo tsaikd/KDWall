@@ -1,0 +1,11 @@
+*.pdb
+*.ilk
+/KDWall.ncb
+/KDWall.suo
+/KDWallApp/KDWall.db
+/KDWallApp/*.dll
+/KDWallApp/*.exe
+/KDWallApp/Makefile*
+/KDWallApp/Debug/
+/KDWallApp/release/
+

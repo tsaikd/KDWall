@@ -1,7 +1,7 @@
 TEMPLATE = app
-TARGET = ../KDWallApp
+TARGET = KDWallApp
 
-BASEDIR = ..
+BASEDIR = $${PWD}/..
 SRCDIR = $${BASEDIR}/src
 INCDIR = $${BASEDIR}/include
 
@@ -12,6 +12,23 @@ include($${INCDIR}/qtsingleapplication/qtsingleapplication.pri)
 win32 {
 	LIBS += User32.lib
 }
+
+CONFIG(debug, debug|release) {
+	TARGET = ../$$join(TARGET,,,d)
+	CONFIG -= release
+	CONFIG += debug
+	DEFINES += DEBUG
+	DEFINES -= NDEBUG
+} else {
+	TARGET = ../$${TARGET}
+	CONFIG -= debug
+	CONFIG += release
+	DEFINES -= DEBUG
+	DEFINES += NDEBUG
+}
+
+#TRANSLATIONS += $${BASEDIR}/lang/MotionManager_zh_TW.ts
+#RESOURCES += $${BASEDIR}/MotionManager.qrc
 
 PRECOMPILED_HEADER += $${BASEDIR}/src/stable.h
 
