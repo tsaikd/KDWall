@@ -1,5 +1,8 @@
 #include "WallMgr.h"
 
+#include "ConfMainApp.h"
+#include "DBMgr.h"
+
 #ifdef Q_WS_WIN
 	#include <windows.h>
 #endif
@@ -7,6 +10,7 @@
 void QWallPaperParam::_init()
 {
 	m_style = STYLE_EXPAND;
+	m_useOrigin = false;
 }
 
 QWallPaperParam& QWallPaperParam::close()
@@ -28,18 +32,12 @@ bool QWallPaperParam::operator == (const QWallPaperParam& x) const
 void QWallMgr::_init()
 {
 	getWallPaper(m_initWall);
-}
-
-QWallMgr& QWallMgr::close()
-{
-	m_listWall.clear();
-
-	_init();
-	return *this;
+	m_initWall.m_useOrigin = true;
 }
 
 bool QWallMgr::getWallPaper(QWallPaperParam& wall)
 {
+	QMutexLocker locker(&m_mutex);
 	typedef QWallPaperParam::STYLE STYLE;
 #ifdef Q_WS_WIN
 	QSettings reg("HKEY_CURRENT_USER\\Control Panel\\Desktop", QSettings::NativeFormat);
@@ -65,14 +63,39 @@ bool QWallMgr::getWallPaper(QWallPaperParam& wall)
 
 bool QWallMgr::setWallPaper(const QWallPaperParam& wall)
 {
-	const QString& path = wall.m_path;
-	const QWallPaperParam::STYLE& style = wall.m_style;
-
-	m_listWall.push_front(wall);
+	QMutexLocker locker(&m_mutex);
+	CDECCP(QConfMainApp, conf);
+	CDECOP(QDesktopWidget, conf, desk);
+	CDECOV(QString, wall, path);
+	CDECOV(QWallPaperParam::STYLE, wall, style);
 
 #ifdef Q_WS_WIN
+	// share desktop will clean wallpaper setting, consider the situation
+	QWallPaperParam cur;
+	if (!getWallPaper(cur))
+		return false;
+	if (cur.m_path.isEmpty())
+		return false;
+
+	QString tmpPath = path;
+	if (!wall.m_useOrigin) {
+		QTemporaryFile tmp(QDir::tempPath()+"/zzXXXXXX.bmp");
+		tmp.setAutoRemove(false);
+		if (!tmp.open())
+			return false;
+		tmpPath = QDir::toNativeSeparators(tmp.fileName());
+		QImage img(path);
+		if (img.height() > desk.height()) {
+			img = img.scaledToHeight(desk.height(), Qt::SmoothTransformation);
+		}
+		if (img.width() > desk.width()) {
+			img = img.scaledToWidth(desk.width(), Qt::SmoothTransformation);
+		}
+		img.save(tmpPath, "BMP");
+	}
+
 	QSettings reg("HKEY_CURRENT_USER\\Control Panel\\Desktop", QSettings::NativeFormat);
-	reg.setValue("Wallpaper", QDir::toNativeSeparators(path));
+	reg.setValue("Wallpaper", tmpPath);
 	if (style == QWallPaperParam::STYLE_EXPAND) {
 		reg.setValue("WallpaperStyle", "2");
 		reg.setValue("TileWallpaper", "0");
@@ -83,12 +106,46 @@ bool QWallMgr::setWallPaper(const QWallPaperParam& wall)
 		reg.setValue("WallpaperStyle", "0");
 		reg.setValue("TileWallpaper", "1");
 	}
-	SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, reinterpret_cast<void *>
-		(QDir::toNativeSeparators(path).toAscii().data()),
-		SPIF_SENDWININICHANGE);
+	QTRACE() << SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0
+		, (PVOID)(tmpPath.toAscii().data())
+		, SPIF_SENDWININICHANGE);
+
+	if (!wall.m_useOrigin) {
+		QFile::remove(tmpPath);
+	}
 
 	return true;
 #endif//Q_WS_WIN
 
 	return false;
+}
+
+bool QWallMgr::setRandWallPaper()
+{
+	QMutexLocker locker(&m_mutex);
+	DECCP(QConfMainApp, conf);
+	DECOP(QDBMgr, conf, db);
+	DECOV(int, conf, wall_timer_sec);
+
+	if (db.getPicCount() <= 0)
+		return false;
+
+	QWallPaperParam wall;
+	wall.m_path = db.getRandPic();
+	wall.m_style = QWallPaperParam::STYLE_CENTER;
+	bool bRes = setWallPaper(wall);
+
+	QTimer::singleShot(wall_timer_sec * 1000, this, SLOT(setRandWallPaper()));
+
+	return bRes;
+}
+
+void QWallMgr::run()
+{
+	DECCP(QConfMainApp, conf);
+	DECOV(int, conf, wall_timer_sec);
+	if (wall_timer_sec <= 0)
+		wall_timer_sec = 1;
+	QTimer::singleShot(wall_timer_sec * 1000, this, SLOT(setRandWallPaper()));
+	exec();
 }

@@ -3,7 +3,7 @@
 
 #include "stable.h"
 
-class QWallPaperParam;
+class QConfMainApp;
 
 class QPicFinder : public QThread
 {
@@ -11,12 +11,11 @@ class QPicFinder : public QThread
 private:
 	void _init();
 public:
-	QPicFinder(QObject* parent = NULL)
-		:	QThread(parent), m_mutex(QMutex::Recursive)
+	QPicFinder(QConfMainApp* conf)
+		:	m_conf(conf), QThread((QObject*)conf), m_mutex(QMutex::Recursive)
 	{ _init(); }
 
 	void addPicDir(const QString& sDir);
-	void clearDB();
 
 protected:
 	virtual void run() { exec(); }
@@ -25,11 +24,12 @@ protected:
 
 signals:
 	void findStepOne();
+	void dirFoundSome(const QString& sDir);
 	void dirFoundOver(const QString& sDir);
 
 protected:
+	QConfMainApp* m_conf;
 	QMutex m_mutex;
-	QSqlDatabase m_sqlDB;
 	QStringList m_dirNameFilters;
 	QStringList m_dirList;
 	int m_picFoundCount;

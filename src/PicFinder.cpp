@@ -1,26 +1,10 @@
 #include "PicFinder.h"
 
-#define INIT_DB_PICLIST \
-	"CREATE TABLE IF NOT EXISTS piclist " \
-	"( path TEXT PRIMARY KEY"		/* picture path */ \
-	", dir TEXT"					/* picture dir, used for search */ \
-	", width INTEGER DEFAULT 0"		/* picture width */ \
-	", height INTEGER DEFAULT 0"	/* picture height */ \
-	");" \
-	"CREATE INDEX IF NOT EXISTS piclist_path ON piclist ( path );" \
-	""
+#include "ConfMainApp.h"
+#include "DBMgr.h"
 
 void QPicFinder::_init()
 {
-	QSqlDatabase& sqlDB = m_sqlDB;
-	sqlDB = QSqlDatabase::addDatabase("QSQLITE");
-	sqlDB.setDatabaseName(PROJNAME ".db");
-	if (sqlDB.open()) {
-		QSqlQuery(INIT_DB_PICLIST);
-	} else {
-		QMessageBox(QMessageBox::Critical, PROJNAME, tr("Open database failed"));
-	}
-
 	m_dirNameFilters << "*.bmp";
 	m_dirNameFilters << "*.jpg";
 	m_dirNameFilters << "*.jpeg";
@@ -32,23 +16,24 @@ void QPicFinder::_init()
 void QPicFinder::addPicDir(const QString& sDir)
 {
 	QMutexLocker locker(&m_mutex);
+	DECCP(QConfMainApp, conf);
+	DECOP(QDBMgr, conf, db);
+
+	db.addDir(sDir);
 	m_dirList.append(sDir);
 	findPicInDir();
-}
-
-void QPicFinder::clearDB()
-{
-	QSqlQuery("DELETE FROM piclist;");
 }
 
 void QPicFinder::findPicInDir()
 {
 	QMutexLocker locker(&m_mutex);
+	DECCP(QConfMainApp, conf);
 	QStringList& dirNameFilters = m_dirNameFilters;
 	QStringList& dirList = m_dirList;
 	int i;
 
 	while (!dirList.isEmpty()) {
+		QTime time = QTime::currentTime();
 		QList<QDir> dirs;
 		const QString& sDir = dirList.takeFirst();
 		dirs.append(QDir(sDir));
@@ -57,6 +42,9 @@ void QPicFinder::findPicInDir()
 
 			const QFileInfoList& fiDirList = dir.entryInfoList(QDir::Dirs|QDir::NoDotAndDotDot);
 			for (i=0 ; i<fiDirList.count() ; i++) {
+				if (conf.m_closing)
+					return;
+
 				const QFileInfo& fi = fiDirList[i];
 				dirs.append(QDir(fi.absoluteFilePath()));
 				QTRACE() << "DIR" << fi.absoluteFilePath();
@@ -65,8 +53,15 @@ void QPicFinder::findPicInDir()
 			dir.setNameFilters(dirNameFilters);
 			const QFileInfoList& fiList = dir.entryInfoList(QDir::Files);
 			for (i=0 ; i<fiList.count() ; i++) {
+				if (conf.m_closing)
+					return;
+msleep(500);
 				const QFileInfo& fi = fiList[i];
 				addPicToDB(fi, sDir);
+				if (time.msecsTo(QTime::currentTime()) > conf.m_picfinder_refresh_msec) {
+					emit(dirFoundSome(sDir));
+					time = QTime::currentTime();
+				}
 				QTRACE() << fi.absoluteFilePath();
 			}
 		}
@@ -81,13 +76,7 @@ void QPicFinder::addPicToDB(const QFileInfo& fi, const QString& sDir)
 		emit(findStepOne());
 	}
 
-	QSqlQuery sql;
-	sql.prepare("INSERT INTO piclist ( path, dir, width, height ) VALUES ( ? , ? , ? , ? );");
-	sql.addBindValue(fi.absoluteFilePath());
-	sql.addBindValue(sDir);
-	sql.addBindValue(0);
-	sql.addBindValue(0);
-	if (!sql.exec()) {
-		QTRACE() << sql.lastError().text();
-	}
+	DECCP(QConfMainApp, conf);
+	DECOP(QDBMgr, conf, db);
+	db.addPic(fi.absoluteFilePath(), sDir);
 }
