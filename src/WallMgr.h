@@ -25,14 +25,14 @@ public:
 	bool operator != (const QWallPaperParam& x) const { return !(*this == x); }
 };
 
-class QWallMgr : public QThread
+class QWallMgr : public QObject
 {
 	Q_OBJECT
 private:
 	void _init();
 public:
 	QWallMgr(QConfMainApp* conf)
-		:	m_conf(conf), QThread((QObject*)conf), m_mutex(QMutex::Recursive)
+		:	m_conf(conf), QObject((QObject*)conf), m_mutex(QMutex::Recursive)
 	{ _init(); }
 
 	QWallPaperParam& initWall() { QMutexLocker locker(&m_mutex); return m_initWall; }
@@ -43,7 +43,7 @@ public slots:
 	bool setRandWallPaper();
 
 protected:
-	virtual void run();
+	virtual void timerEvent(QTimerEvent* e);
 
 protected:
 	QConfMainApp* m_conf;

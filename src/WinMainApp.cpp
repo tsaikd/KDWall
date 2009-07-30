@@ -92,7 +92,6 @@ void QWinMainApp::_init()
 	}
 	setLayout(lot);
 
-	wallmgr.start(QThread::LowestPriority);
 	if (wallmgr.setRandWallPaper())
 		bFirstChangeWallPaper = true;
 
@@ -122,12 +121,7 @@ void QWinMainApp::closeEvent(QCloseEvent* event)
 
 	conf.m_closing = true;
 
-	wallmgr.quit();
 	picfinder.quit();
-	if (!wallmgr.wait(10000)) {
-		QTRACE() << "WallMgr wait timeout";
-		wallmgr.exit(1);
-	}
 	if (!picfinder.wait(10000)) {
 		QTRACE() << "PicFinder wait timeout";
 		picfinder.exit(1);

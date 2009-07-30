@@ -33,6 +33,7 @@ void QWallMgr::_init()
 {
 	getWallPaper(m_initWall);
 	m_initWall.m_useOrigin = true;
+	m_timerId = 0;
 }
 
 bool QWallMgr::getWallPaper(QWallPaperParam& wall)
@@ -106,9 +107,10 @@ bool QWallMgr::setWallPaper(const QWallPaperParam& wall)
 		reg.setValue("WallpaperStyle", "0");
 		reg.setValue("TileWallpaper", "1");
 	}
-	QTRACE() << SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0
+	SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0
 		, (PVOID)(tmpPath.toAscii().data())
 		, SPIF_SENDWININICHANGE);
+	QTRACE() << path;
 
 	if (!wall.m_useOrigin) {
 		QFile::remove(tmpPath);
@@ -126,6 +128,12 @@ bool QWallMgr::setRandWallPaper()
 	DECCP(QConfMainApp, conf);
 	DECOP(QDBMgr, conf, db);
 	DECOV(int, conf, wall_timer_sec);
+	DECCV(int, timerId);
+
+	if (timerId) {
+		killTimer(timerId);
+		timerId = 0;
+	}
 
 	if (db.getPicCount() <= 0)
 		return false;
@@ -135,17 +143,17 @@ bool QWallMgr::setRandWallPaper()
 	wall.m_style = QWallPaperParam::STYLE_CENTER;
 	bool bRes = setWallPaper(wall);
 
-	QTimer::singleShot(wall_timer_sec * 1000, this, SLOT(setRandWallPaper()));
+	timerId = startTimer(wall_timer_sec * 1000);
 
 	return bRes;
 }
 
-void QWallMgr::run()
+void QWallMgr::timerEvent(QTimerEvent* e)
 {
-	DECCP(QConfMainApp, conf);
-	DECOV(int, conf, wall_timer_sec);
-	if (wall_timer_sec <= 0)
-		wall_timer_sec = 1;
-	QTimer::singleShot(wall_timer_sec * 1000, this, SLOT(setRandWallPaper()));
-	exec();
+	DECCV(int, timerId);
+	if (timerId == e->timerId()) {
+		setRandWallPaper();
+	} else {
+		killTimer(e->timerId());
+	}
 }

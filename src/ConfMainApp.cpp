@@ -14,7 +14,7 @@ void QConfMainApp::_init()
 	m_pichist_max_num = conf.value("pichist_max_num", "100").toInt();
 
 	m_wallmgr = new QWallMgr(this);
-	m_wall_timer_sec = conf.value("wall_timer_sec", "30").toInt();
+	m_wall_timer_sec = conf.value("wall_timer_sec", "5").toInt();
 
 	m_picfinder = new QPicFinder(this);
 	m_picfinder_refresh_msec = conf.value("picfinder_refresh_msec", "1000").toInt();
