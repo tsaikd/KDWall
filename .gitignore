@@ -6,7 +6,10 @@
 /KDWallApp/KDWall.db
 /KDWallApp/*.dll
 /KDWallApp/*.exe
+/KDWallApp/KDWallApp
+/KDWallApp/KDWallAppd
 /KDWallApp/Makefile*
 /KDWallApp/[Dd]ebug/
 /KDWallApp/[Rr]elease/
+/KDWallApp/tmp/
 
