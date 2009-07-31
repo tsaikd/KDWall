@@ -1,3 +1,8 @@
+/**
+ * @file Debug.cpp
+ * @see Debug.h
+ **/
+
 #include "Debug.h"
 
 #ifdef DEBUG

@@ -1,3 +1,15 @@
+/**
+ * @file Debug.h
+ * @brief General debug functions and MACROs
+ *
+ * Support for library QT4 \n
+ * Support for IDE msvc2005 msvc2008
+ *
+ * @author tsaikd@gmail.com
+ * @version 1.0.0.0
+ * @date 2009/07/31
+ **/
+
 #ifndef _GENERAL_DEBUG_H
 #define _GENERAL_DEBUG_H
 
@@ -180,29 +192,45 @@
 	#define SAFE_DELETEARR(x) if (x) { delete [] (x); (x) = NULL; }
 #endif//SAFE_DELETEARR
 
+#ifndef ZERO_ARR
+	#define ZERO_ARR(var) memset(var, 0, sizeof(var));
+#endif//ZERO_ARR
+
 #ifndef DECCV
-	#define DECCV(type, var)		type& var = m_##var				// declare current class variable
+	#define DECCV(type, var)			type& var = m_##var					// declare current class variable
 #endif//DECCV
 #ifndef DECCP
-	#define DECCP(type, var)		type& var = *m_##var			// declare current class variable pointer
+	#define DECCP(type, var)			type& var = *m_##var				// declare current class variable pointer
 #endif//DECCP
 #ifndef DECOV
-	#define DECOV(type, base, var)	type& var = base.m_##var		// declare other class variable
+	#define DECOV(type, base, var)		type& var = (base).m_##var			// declare other class variable
 #endif//DECOV
 #ifndef DECOP
-	#define DECOP(type, base, var)	type& var = *base.m_##var		// declare other class variable pointer
+	#define DECOP(type, base, var)		type& var = *(base).m_##var			// declare other class variable pointer
 #endif//DECOP
 #ifndef CDECCV
-	#define CDECCV(type, var)		const type& var = m_##var		// declare current class const variable
+	#define CDECCV(type, var)			const type& var = m_##var			// declare current class const variable
 #endif//CDECCV
 #ifndef CDECCP
-	#define CDECCP(type, var)		const type& var = *m_##var		// declare current class const variable pointer
+	#define CDECCP(type, var)			const type& var = *m_##var			// declare current class const variable pointer
 #endif//CDECCP
 #ifndef CDECOV
-	#define CDECOV(type, base, var)	const type& var = base.m_##var	// declare other class const variable
+	#define CDECOV(type, base, var)		const type& var = (base).m_##var	// declare other class const variable
 #endif//CDECOV
 #ifndef CDECOP
-	#define CDECOP(type, base, var)	const type& var = *base.m_##var	// declare other class const variable pointer
+	#define CDECOP(type, base, var)		const type& var = *(base).m_##var	// declare other class const variable pointer
 #endif//CDECOP
+#ifndef DEWRV
+	// declare and write renamed variable with new value
+	#define DEWRV(type, var, member, val) \
+		member = (val); \
+		type& var = member
+#endif//DEWRV
+#ifndef DEWRP
+	// declare and write renamed variable pointer with new value
+	#define DEWRP(type, var, member, val) \
+		member = (val); \
+		type& var = *member
+#endif//DEWRP
 
 #endif//_GENERAL_DEBUG_H
