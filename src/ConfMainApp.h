@@ -27,6 +27,7 @@ public:
 	int m_wall_timer_sec;
 
 	QPicFinder* m_picfinder;
+	bool m_closingPicfinder;
 	int m_picfinder_refresh_msec;
 
 	QDesktopWidget* m_desk;

@@ -20,6 +20,11 @@
 
 void QDBMgr::_init()
 {
+	if (!QSqlDatabase::isDriverAvailable("QSQLITE")) {
+		QMessageBox::critical(NULL, PROJNAME, tr("SQLITE not supported"));
+		return;
+	}
+
 	DECCV(QSqlDatabase, db);
 	db = QSqlDatabase::addDatabase("QSQLITE");
 	db.setDatabaseName(PROJNAME ".db");
@@ -27,7 +32,7 @@ void QDBMgr::_init()
 		QSqlQuery(INIT_DB_PICLIST);
 		QSqlQuery(INIT_DB_DIRLIST);
 	} else {
-		QMessageBox(QMessageBox::Critical, PROJNAME, tr("Open database failed"));
+		QMessageBox::critical(NULL, PROJNAME, tr("Open database failed"));
 	}
 
 }

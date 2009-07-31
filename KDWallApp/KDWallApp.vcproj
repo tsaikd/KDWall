@@ -25,7 +25,7 @@
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="qmake &amp;&amp; nmake debug"
-				ReBuildCommandLine="qmake &amp;&amp; nmake clean debug debug"
+				ReBuildCommandLine="qmake &amp;&amp; nmake clean-debug debug"
 				CleanCommandLine="nmake clean-debug"
 				Output="KDWallAppd.exe"
 				PreprocessorDefinitions="WIN32;_DEBUG;QT_VERSION"
@@ -44,9 +44,9 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="qmake &amp;&amp; nmake debug"
-				ReBuildCommandLine="qmake &amp;&amp; nmake clean debug debug"
-				CleanCommandLine="nmake clean-debug"
+				BuildCommandLine="qmake &amp;&amp; nmake release"
+				ReBuildCommandLine="qmake &amp;&amp; nmake clean-release release"
+				CleanCommandLine="nmake clean-release"
 				Output="KDWallApp.exe"
 				PreprocessorDefinitions="WIN32;NDEBUG;QT_VERSION"
 				IncludeSearchPath=""
@@ -154,6 +154,10 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 		</Filter>
+		<File
+			RelativePath="..\KDWall.qrc"
+			>
+		</File>
 		<File
 			RelativePath=".\KDWallApp.pro"
 			>

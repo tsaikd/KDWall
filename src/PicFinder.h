@@ -15,12 +15,16 @@ public:
 		:	m_conf(conf), QThread((QObject*)conf), m_mutex(QMutex::Recursive)
 	{ _init(); }
 
+public slots: // rewrite functions
+	void start(Priority priority = InheritPriority);
+
+	bool waitStop(unsigned long time = ULONG_MAX);
 	void addPicDir(const QString& sDir);
+	void removePicDir(const QString& sDir);
 
 protected:
-	virtual void run() { exec(); }
+	virtual void run();
 	void findPicInDir();
-	void addPicToDB(const QFileInfo& fi, const QString& sDir);
 
 signals:
 	void findStepOne();
@@ -32,7 +36,6 @@ protected:
 	QMutex m_mutex;
 	QStringList m_dirNameFilters;
 	QStringList m_dirList;
-	int m_picFoundCount;
 };
 
 #endif//_KDWALL_PICFINDER_H

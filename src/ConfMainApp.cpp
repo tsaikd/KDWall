@@ -17,6 +17,7 @@ void QConfMainApp::_init()
 	m_wall_timer_sec = conf.value("wall_timer_sec", "5").toInt();
 
 	m_picfinder = new QPicFinder(this);
+	m_closingPicfinder = false;
 	m_picfinder_refresh_msec = conf.value("picfinder_refresh_msec", "1000").toInt();
 
 	m_desk = new QDesktopWidget();

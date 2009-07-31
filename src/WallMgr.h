@@ -39,8 +39,12 @@ public:
 
 public slots:
 	bool getWallPaper(QWallPaperParam& wall);
-	bool setWallPaper(const QWallPaperParam& wall);
+	bool setWallPaper(QWallPaperParam& wall);
 	bool setRandWallPaper();
+
+signals:
+	void changingWallPaper(const QWallPaperParam& wall);
+	void changedWallPaper(const QWallPaperParam& wall);
 
 protected:
 	virtual void timerEvent(QTimerEvent* e);

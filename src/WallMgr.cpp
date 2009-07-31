@@ -62,13 +62,14 @@ bool QWallMgr::getWallPaper(QWallPaperParam& wall)
 	return true;
 }
 
-bool QWallMgr::setWallPaper(const QWallPaperParam& wall)
+bool QWallMgr::setWallPaper(QWallPaperParam& wall)
 {
 	QMutexLocker locker(&m_mutex);
 	CDECCP(QConfMainApp, conf);
 	CDECOP(QDesktopWidget, conf, desk);
 	CDECOV(QString, wall, path);
 	CDECOV(QWallPaperParam::STYLE, wall, style);
+	DECOV(bool, wall, useOrigin);
 
 #ifdef Q_WS_WIN
 	// share desktop will clean wallpaper setting, consider the situation
@@ -78,21 +79,26 @@ bool QWallMgr::setWallPaper(const QWallPaperParam& wall)
 	if (cur.m_path.isEmpty())
 		return false;
 
+	emit(changingWallPaper(wall));
 	QString tmpPath = path;
-	if (!wall.m_useOrigin) {
+	if (!useOrigin) {
 		QTemporaryFile tmp(QDir::tempPath()+"/zzXXXXXX.bmp");
 		tmp.setAutoRemove(false);
-		if (!tmp.open())
-			return false;
-		tmpPath = QDir::toNativeSeparators(tmp.fileName());
-		QImage img(path);
-		if (img.height() > desk.height()) {
-			img = img.scaledToHeight(desk.height(), Qt::SmoothTransformation);
+		if (tmp.open()) {
+			tmpPath = QDir::toNativeSeparators(tmp.fileName());
+			QImage img(path);
+			if (img.height() > desk.height()) {
+				img = img.scaledToHeight(desk.height(), Qt::SmoothTransformation);
+			}
+			if (img.width() > desk.width()) {
+				img = img.scaledToWidth(desk.width(), Qt::SmoothTransformation);
+			}
+			img.save(tmpPath, "BMP");
+		} else {
+			QTRACE() << "Create tmpfile failed";
+			tmpPath = path;
+			useOrigin = true;
 		}
-		if (img.width() > desk.width()) {
-			img = img.scaledToWidth(desk.width(), Qt::SmoothTransformation);
-		}
-		img.save(tmpPath, "BMP");
 	}
 
 	QSettings reg("HKEY_CURRENT_USER\\Control Panel\\Desktop", QSettings::NativeFormat);
@@ -112,9 +118,10 @@ bool QWallMgr::setWallPaper(const QWallPaperParam& wall)
 		, SPIF_SENDWININICHANGE);
 	QTRACE() << path;
 
-	if (!wall.m_useOrigin) {
+	if (!useOrigin) {
 		QFile::remove(tmpPath);
 	}
+	emit(changedWallPaper(wall));
 
 	return true;
 #endif//Q_WS_WIN

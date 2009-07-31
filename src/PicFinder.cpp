@@ -9,8 +9,25 @@ void QPicFinder::_init()
 	m_dirNameFilters << "*.jpg";
 	m_dirNameFilters << "*.jpeg";
 	m_dirNameFilters << "*.png";
+}
 
-	m_picFoundCount = 0;
+void QPicFinder::start(Priority priority/* = InheritPriority*/)
+{
+	if (isRunning())
+		return;
+
+	DECCP(QConfMainApp, conf);
+	DECOV(bool, conf, closingPicfinder);
+	closingPicfinder = false;
+	QThread::start(priority);
+}
+
+bool QPicFinder::waitStop(unsigned long time/* = ULONG_MAX*/)
+{
+	DECCP(QConfMainApp, conf);
+	DECOV(bool, conf, closingPicfinder);
+	closingPicfinder = true;
+	return QThread::wait(time);
 }
 
 void QPicFinder::addPicDir(const QString& sDir)
@@ -21,29 +38,50 @@ void QPicFinder::addPicDir(const QString& sDir)
 
 	db.addDir(sDir);
 	m_dirList.append(sDir);
-	findPicInDir();
+	start(QThread::LowestPriority);
 }
 
-void QPicFinder::findPicInDir()
+void QPicFinder::removePicDir(const QString& sDir)
 {
 	QMutexLocker locker(&m_mutex);
 	DECCP(QConfMainApp, conf);
-	QStringList& dirNameFilters = m_dirNameFilters;
-	QStringList& dirList = m_dirList;
+	DECOP(QDBMgr, conf, db);
+	DECCV(QStringList, dirList);
+	int i;
+
+	waitStop(10000);
+	while ((i = dirList.indexOf(sDir)) >= 0) {
+		dirList.removeAt(i);
+	}
+	db.rmDir(sDir);
+	start(QThread::LowestPriority);
+}
+
+void QPicFinder::run()
+{
+	DECCP(QConfMainApp, conf);
+	DECOP(QDBMgr, conf, db);
+	CDECOV(bool, conf, closing);
+	CDECOV(int, conf, picfinder_refresh_msec);
+	CDECOV(bool, conf, closingPicfinder);
+	DECCV(QStringList, dirNameFilters);
+	DECCV(QStringList, dirList);
+	QString sDir;
 	int i;
 
 	while (!dirList.isEmpty()) {
 		QTime time = QTime::currentTime();
 		QList<QDir> dirs;
-		const QString& sDir = dirList.takeFirst();
+		sDir = dirList.first();
 		dirs.append(QDir(sDir));
 		while (!dirs.isEmpty()) {
 			QDir& dir = dirs.takeFirst();
 
 			const QFileInfoList& fiDirList = dir.entryInfoList(QDir::Dirs|QDir::NoDotAndDotDot);
 			for (i=0 ; i<fiDirList.count() ; i++) {
-				if (conf.m_closing)
+				if (closing || closingPicfinder)
 					return;
+				qApp->processEvents();
 
 				const QFileInfo& fi = fiDirList[i];
 				dirs.append(QDir(fi.absoluteFilePath()));
@@ -53,12 +91,13 @@ void QPicFinder::findPicInDir()
 			dir.setNameFilters(dirNameFilters);
 			const QFileInfoList& fiList = dir.entryInfoList(QDir::Files);
 			for (i=0 ; i<fiList.count() ; i++) {
-				if (conf.m_closing)
+				if (closing || closingPicfinder)
 					return;
-msleep(500);
+				qApp->processEvents();
+
 				const QFileInfo& fi = fiList[i];
-				addPicToDB(fi, sDir);
-				if (time.msecsTo(QTime::currentTime()) > conf.m_picfinder_refresh_msec) {
+				db.addPic(fi.absoluteFilePath(), sDir);
+				if (time.msecsTo(QTime::currentTime()) > picfinder_refresh_msec) {
 					emit(dirFoundSome(sDir));
 					time = QTime::currentTime();
 				}
@@ -66,17 +105,7 @@ msleep(500);
 			}
 		}
 
+		dirList.removeFirst();
 		emit(dirFoundOver(sDir));
 	}
-}
-
-void QPicFinder::addPicToDB(const QFileInfo& fi, const QString& sDir)
-{
-	if (m_picFoundCount++ > 100) {
-		emit(findStepOne());
-	}
-
-	DECCP(QConfMainApp, conf);
-	DECOP(QDBMgr, conf, db);
-	db.addPic(fi.absoluteFilePath(), sDir);
 }

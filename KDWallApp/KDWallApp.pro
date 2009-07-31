@@ -27,8 +27,9 @@ CONFIG(debug, debug|release) {
 	DEFINES += NDEBUG
 }
 
-#TRANSLATIONS += $${BASEDIR}/lang/MotionManager_zh_TW.ts
-#RESOURCES += $${BASEDIR}/MotionManager.qrc
+#TRANSLATIONS += $${BASEDIR}/lang/KDWall.ts
+RESOURCES += $${BASEDIR}/KDWall.qrc
+RC_FILE = $${BASEDIR}/KDWall.rc
 
 PRECOMPILED_HEADER += $${BASEDIR}/src/stable.h
 
