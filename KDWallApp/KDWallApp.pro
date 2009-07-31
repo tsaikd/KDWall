@@ -11,7 +11,7 @@ win32 {
 	LIBS += User32.lib
 }
 
-#TRANSLATIONS += $${BASEDIR}/lang/KDWall.ts
+TRANSLATIONS += $${BASEDIR}/lang/KDWall_zh_TW.ts
 RESOURCES += $${BASEDIR}/KDWall.qrc
 RC_FILE = $${BASEDIR}/KDWall.rc
 
