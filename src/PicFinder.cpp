@@ -75,7 +75,7 @@ void QPicFinder::run()
 		sDir = dirList.first();
 		dirs.append(QDir(sDir));
 		while (!dirs.isEmpty()) {
-			QDir& dir = dirs.takeFirst();
+			QDir dir = dirs.takeFirst();
 
 			const QFileInfoList& fiDirList = dir.entryInfoList(QDir::Dirs|QDir::NoDotAndDotDot);
 			for (i=0 ; i<fiDirList.count() ; i++) {

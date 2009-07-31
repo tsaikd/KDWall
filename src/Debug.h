@@ -54,7 +54,12 @@
 #endif//DEBUG
 
 #ifdef QT_VERSION
-	#define QTRACE() (qDebug().nospace() << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":").space()
+	#include <QtCore/QDebug>
+	#ifndef QT_NO_DEBUG_OUTPUT
+		#define QTRACE() (qDebug().nospace() << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":").space()
+	#else//QT_NO_DEBUG_OUTPUT
+		#define QTRACE qDebug
+	#endif//QT_NO_DEBUG_OUTPUT
 #endif//QT_VERSION
 
 #ifndef QTRACE

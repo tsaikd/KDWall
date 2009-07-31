@@ -15,7 +15,7 @@ void QTreePicDir::dragEnterEvent(QDragEnterEvent* e)
 
 void QTreePicDir::dropEvent(QDropEvent* e)
 {
-	QList<QUrl>& urls = e->mimeData()->urls();
+	QList<QUrl> urls = e->mimeData()->urls();
 	if (urls.isEmpty())
 		return;
 

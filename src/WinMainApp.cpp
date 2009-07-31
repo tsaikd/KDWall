@@ -31,7 +31,7 @@ void QWinMainApp::_init()
 		connect(&tray, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(trayActivated(QSystemTrayIcon::ActivationReason)));
 		QMenu* menu = new QMenu(this);
 		menu->addAction(tr("&Random Picture"), &wallmgr, SLOT(setRandWallPaper()));
-		menu->addAction(tr("E&xit"), this, SLOT(close()));
+		menu->addAction(tr("&Quit"), this, SLOT(close()));
 		tray.setContextMenu(menu);
 	}
 
@@ -126,7 +126,7 @@ void QWinMainApp::_init()
 	// post init
 	{
 		DECOP(QDBMgr, conf, db);
-		QStringList& dirs = db.getDirList();
+		QStringList dirs = db.getDirList();
 		for (int i=0 ; i<dirs.count() ; i++) {
 			addDirToTree(dirs[i]);
 		}
@@ -147,6 +147,7 @@ void QWinMainApp::closeEvent(QCloseEvent* event)
 
 	picfinder.quit();
 	if (!picfinder.wait(10000)) {
+		qWarning() << "Q" << "Z";
 		QTRACE() << "PicFinder wait timeout";
 		picfinder.exit(1);
 	}
@@ -159,6 +160,7 @@ void QWinMainApp::closeEvent(QCloseEvent* event)
 	QWidget::closeEvent(event);
 }
 
+#ifdef Q_WS_WIN
 #include <Windows.h>
 bool QWinMainApp::winEvent(MSG* message, long* result)
 {
@@ -174,6 +176,7 @@ bool QWinMainApp::winEvent(MSG* message, long* result)
 	}
 	return QWidget::winEvent(message, result);
 }
+#endif//Q_WS_WIN
 
 void QWinMainApp::handleAppMessage(const QString& sMsg)
 {

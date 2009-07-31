@@ -7,24 +7,8 @@ INCDIR = $${BASEDIR}/include
 
 QT += sql
 
-include($${INCDIR}/qtsingleapplication/qtsingleapplication.pri)
-
 win32 {
 	LIBS += User32.lib
-}
-
-CONFIG(debug, debug|release) {
-	TARGET = ../$$join(TARGET,,,d)
-	CONFIG -= release
-	CONFIG += debug
-	DEFINES += DEBUG
-	DEFINES -= NDEBUG
-} else {
-	TARGET = ../$${TARGET}
-	CONFIG -= debug
-	CONFIG += release
-	DEFINES -= DEBUG
-	DEFINES += NDEBUG
 }
 
 #TRANSLATIONS += $${BASEDIR}/lang/KDWall.ts
@@ -46,3 +30,6 @@ HEADERS += $${SRCDIR}/PicFinder.h
 SOURCES += $${SRCDIR}/PicFinder.cpp
 HEADERS += $${SRCDIR}/TreePicDir.h
 SOURCES += $${SRCDIR}/TreePicDir.cpp
+
+include($${INCDIR}/qtsingleapplication/qtsingleapplication.pri)
+include($${BASEDIR}/general.pri)

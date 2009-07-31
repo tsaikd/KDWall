@@ -21,7 +21,9 @@ public:
 
 protected:
 	virtual void closeEvent(QCloseEvent* event);
+#ifdef Q_WS_WIN
 	virtual bool winEvent(MSG* message, long* result);
+#endif//Q_WS_WIN
 
 public slots:
 	void handleAppMessage(const QString& sMsg);

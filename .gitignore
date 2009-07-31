@@ -7,6 +7,6 @@
 /KDWallApp/*.dll
 /KDWallApp/*.exe
 /KDWallApp/Makefile*
-/KDWallApp/Debug/
-/KDWallApp/release/
+/KDWallApp/[Dd]ebug/
+/KDWallApp/[Rr]elease/
 
