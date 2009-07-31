@@ -4,6 +4,7 @@ TARGET = KDWallApp
 BASEDIR = $${PWD}/..
 SRCDIR = $${BASEDIR}/src
 INCDIR = $${BASEDIR}/include
+LANGDIR = $${BASEDIR}/lang
 
 QT += sql
 
@@ -11,11 +12,11 @@ win32 {
 	LIBS += User32.lib
 }
 
-TRANSLATIONS += $${BASEDIR}/lang/KDWall_zh_TW.ts
+TRANSLATIONS += $${LANGDIR}/KDWall_zh_TW.ts
 RESOURCES += $${BASEDIR}/KDWall.qrc
 RC_FILE = $${BASEDIR}/KDWall.rc
 
-PRECOMPILED_HEADER += $${BASEDIR}/src/stable.h
+PRECOMPILED_HEADER += $${SRCDIR}/stable.h
 
 SOURCES += $${SRCDIR}/Debug.cpp
 SOURCES += $${SRCDIR}/mainApp.cpp

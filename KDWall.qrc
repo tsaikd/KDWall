@@ -1,6 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
-	<file>icon/MagicKD.ico</file>
+  <file>lang/KDWall_zh_TW.qm</file>
+  <file>icon/MagicKD.ico</file>
 	<file>icon/MagicKD_FullScreen.ico</file>
 	<file>icon/icon_changingwall.ico</file>
 </qresource>
