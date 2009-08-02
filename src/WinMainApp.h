@@ -8,6 +8,7 @@ enum APPMSG {
 };
 
 class QConfMainApp;
+class QWinConfMainApp;
 class QTreePicDir;
 class QWallPaperParam;
 
@@ -20,7 +21,7 @@ public:
 	QWinMainApp() { _init(); }
 
 protected:
-	virtual void closeEvent(QCloseEvent* event);
+	virtual void closeEvent(QCloseEvent* e);
 #ifdef Q_WS_WIN
 	virtual bool winEvent(MSG* message, long* result);
 #endif//Q_WS_WIN
@@ -36,8 +37,10 @@ protected slots:
 	void removeCurDirFromTree();
 	void refreshCurDirFromTree();
 	void updateTreePicCount(const QString& sDir);
-	void trayToChangingWall(const QWallPaperParam& wall);
-	void trayToChangedWall(const QWallPaperParam& wall);
+	void changingWallPaper(const QWallPaperParam& wall);
+	void changedWallPaper(const QWallPaperParam& wall);
+	void treeItemChanged(QTreeWidgetItem* item, int column);
+	void showWinConf();
 
 	// for trayicon
 	void trayActivated(QSystemTrayIcon::ActivationReason reason);
@@ -49,6 +52,7 @@ protected:
 	QSystemTrayIcon* m_tray;
 	QComboBox* m_cboProfile;
 	QTreePicDir* m_treePicDir;
+	QLabel* m_lblCurWallPath;
 };
 
 #endif//_KDWALL_WINMAINAPP_H

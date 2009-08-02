@@ -1,6 +1,7 @@
 #include "WinMainApp.h"
 
 #include "ConfMainApp.h"
+#include "WinConfMainApp.h"
 #include "DBMgr.h"
 #include "WallMgr.h"
 #include "PicFinder.h"
@@ -13,8 +14,8 @@ enum TREE_PICDIR_COLUMN {
 
 void QWinMainApp::_init()
 {
-	m_conf = new QConfMainApp(this);
-	DECCP(QConfMainApp, conf);
+	DEWRP(QConfMainApp, conf, m_conf, new QConfMainApp(this));
+	conf.m_mainWidget = this;
 	DECOP(QWallMgr, conf, wallmgr);
 	DECCV(bool, bFirstChangeWallPaper);
 	bFirstChangeWallPaper = false;
@@ -24,11 +25,11 @@ void QWinMainApp::_init()
 	addAction(act);
 	connect(act, SIGNAL(triggered()), this, SLOT(close()));
 
-	{ // Tray Icon
-		m_tray = new QSystemTrayIcon(this);
-		DECCP(QSystemTrayIcon, tray);
-		tray.setIcon(QIcon(":/icon/MagicKD.ico"));
-		connect(&tray, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(trayActivated(QSystemTrayIcon::ActivationReason)));
+	// Tray Icon
+	DEWRP(QSystemTrayIcon, tray, m_tray, new QSystemTrayIcon(this));
+	tray.setIcon(QIcon(":/icon/MagicKD.ico"));
+	connect(&tray, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(trayActivated(QSystemTrayIcon::ActivationReason)));
+	{	// Tray menu
 		QMenu* menu = new QMenu(this);
 		menu->addAction(tr("&Random Picture"), &wallmgr, SLOT(setRandWallPaper()));
 		menu->addAction(tr("&Quit"), this, SLOT(close()));
@@ -51,17 +52,23 @@ void QWinMainApp::_init()
 		lot->addLayout(lot2);
 	}
 	{
+		QLabel*& lbl = m_lblCurWallPath;
+		lbl = new QLabel(this);
+		lot->addWidget(lbl);
+	}
+	{
 		QHBoxLayout* lot2 = new QHBoxLayout();
 		{
-			QTreePicDir*& tree = m_treePicDir;
-			tree = new QTreePicDir(this);
-			tree->setRootIsDecorated(false);
+			DEWRP(QTreePicDir, tree, m_treePicDir, new QTreePicDir(this));
+			tree.setRootIsDecorated(false);
 			QStringList headers;
 			headers << tr("Path");
 			headers << tr("Count");
-			tree->setHeaderLabels(headers);
-			connect(tree, SIGNAL(dropUrls(QList<QUrl>&)), this, SLOT(addUrlsToTree(QList<QUrl>&)));
-			lot2->addWidget(tree);
+			tree.setHeaderLabels(headers);
+			tree.setSortingEnabled(true);
+			connect(&tree, SIGNAL(dropUrls(QList<QUrl>&)), this, SLOT(addUrlsToTree(QList<QUrl>&)));
+			connect(&tree, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(treeItemChanged(QTreeWidgetItem*, int)));
+			lot2->addWidget(&tree);
 		}
 		{
 			QVBoxLayout* lot3 = new QVBoxLayout();
@@ -104,6 +111,12 @@ void QWinMainApp::_init()
 		}
 		{
 			QPushButton* btn = new QPushButton(this);
+			btn->setText(tr("&Config"));
+			connect(btn, SIGNAL(clicked()), this, SLOT(showWinConf()));
+			lot2->addWidget(btn);
+		}
+		{
+			QPushButton* btn = new QPushButton(this);
 			btn->setText(tr("&Quit"));
 			connect(btn, SIGNAL(clicked()), this, SLOT(close()));
 			lot2->addWidget(btn);
@@ -112,6 +125,9 @@ void QWinMainApp::_init()
 	}
 	setLayout(lot);
 
+	connect(&wallmgr, SIGNAL(changingWallPaper(const QWallPaperParam&)), this, SLOT(changingWallPaper(const QWallPaperParam&)));
+	connect(&wallmgr, SIGNAL(changedWallPaper(const QWallPaperParam&)), this, SLOT(changedWallPaper(const QWallPaperParam&)));
+
 	if (wallmgr.setRandWallPaper())
 		bFirstChangeWallPaper = true;
 
@@ -119,9 +135,6 @@ void QWinMainApp::_init()
 	connect(&picfinder, SIGNAL(dirFoundSome(const QString&)), this, SLOT(updateTreePicCount(const QString&)));
 	connect(&picfinder, SIGNAL(dirFoundOver(const QString&)), this, SLOT(updateTreePicCount(const QString&)));
 	picfinder.start(QThread::LowestPriority);
-
-	connect(&wallmgr, SIGNAL(changingWallPaper(const QWallPaperParam&)), this, SLOT(trayToChangingWall(const QWallPaperParam&)));
-	connect(&wallmgr, SIGNAL(changedWallPaper(const QWallPaperParam&)), this, SLOT(trayToChangedWall(const QWallPaperParam&)));
 
 	// post init
 	{
@@ -132,14 +145,17 @@ void QWinMainApp::_init()
 		}
 	}
 
-	show();
+	DECOV(bool, conf, initWithoutWindow);
+	if (initWithoutWindow) {
+		tray.show();
+	} else {
+		show();
+	}
 }
 
-void QWinMainApp::closeEvent(QCloseEvent* event)
+void QWinMainApp::closeEvent(QCloseEvent* e)
 {
 	DECCP(QConfMainApp, conf);
-
-	DECOP(QWallMgr, conf, wallmgr);
 	DECOP(QPicFinder, conf, picfinder);
 
 	conf.m_closing = true;
@@ -152,12 +168,7 @@ void QWinMainApp::closeEvent(QCloseEvent* event)
 		picfinder.exit(1);
 	}
 
-	QWallPaperParam wall;
-	wallmgr.getWallPaper(wall);
-	if (wall != wallmgr.initWall())
-		wallmgr.setWallPaper(wallmgr.initWall());
-
-	QWidget::closeEvent(event);
+	QWidget::closeEvent(e);
 }
 
 #ifdef Q_WS_WIN
@@ -195,21 +206,23 @@ void QWinMainApp::addDirToTree(const QString& sDir)
 {
 	DECCP(QConfMainApp, conf);
 	DECOP(QDBMgr, conf, db);
-
-	QTreePicDir*& tree = m_treePicDir;
-	QList<QTreeWidgetItem*> list = tree->findItems(sDir, Qt::MatchExactly, TREE_PICDIR_COLUMN_PATH);
-	if (list.isEmpty()) {
-		QTreePicDir*& tree = m_treePicDir;
-		QTreeWidgetItem* item = new QTreeWidgetItem();
-		item->setText(TREE_PICDIR_COLUMN_PATH, sDir);
-		item->setText(TREE_PICDIR_COLUMN_PICCOUNT, QString::number(db.getDirPicCount(sDir)));
-		tree->addTopLevelItem(item);
-		qApp->processEvents();
-	}
+	DECRP(QTreePicDir, tree, m_treePicDir);
 
 	if (!db.isDirExists(sDir)) {
 		DECOP(QPicFinder, conf, picfinder);
 		picfinder.addPicDir(sDir);
+	}
+
+	QList<QTreeWidgetItem*> list = tree.findItems(sDir, Qt::MatchExactly, TREE_PICDIR_COLUMN_PATH);
+	if (list.isEmpty()) {
+		QTreeWidgetItem* item = new QTreeWidgetItem();
+		item->setText(TREE_PICDIR_COLUMN_PATH, sDir);
+		item->setText(TREE_PICDIR_COLUMN_PICCOUNT, QString::number(db.getDirPicCount(sDir)));
+		item->setCheckState(TREE_PICDIR_COLUMN_PATH, db.dirEnable(sDir) ? Qt::Checked : Qt::Unchecked);
+		tree.addTopLevelItem(item);
+		tree.resizeColumnToContents(TREE_PICDIR_COLUMN_PATH);
+		tree.resizeColumnToContents(TREE_PICDIR_COLUMN_PICCOUNT);
+		qApp->processEvents();
 	}
 }
 
@@ -237,8 +250,8 @@ void QWinMainApp::removeCurDirFromTree()
 	DECCP(QConfMainApp, conf);
 
 	DECOP(QPicFinder, conf, picfinder);
-	QTreePicDir*& tree = m_treePicDir;
-	QList<QTreeWidgetItem*> list = tree->selectedItems();
+	DECRP(QTreePicDir, tree, m_treePicDir);
+	QList<QTreeWidgetItem*> list = tree.selectedItems();
 	QTreeWidgetItem* item;
 	int i;
 
@@ -246,8 +259,8 @@ void QWinMainApp::removeCurDirFromTree()
 		item = list.takeFirst();
 		const QString& sDir = item->text(TREE_PICDIR_COLUMN_PATH);
 		picfinder.removePicDir(sDir);
-		i = tree->indexOfTopLevelItem(item);
-		tree->takeTopLevelItem(i);
+		i = tree.indexOfTopLevelItem(item);
+		tree.takeTopLevelItem(i);
 	}
 }
 
@@ -256,16 +269,28 @@ void QWinMainApp::refreshCurDirFromTree()
 	DECCP(QConfMainApp, conf);
 
 	DECOP(QPicFinder, conf, picfinder);
-	QTreePicDir*& tree = m_treePicDir;
-	QList<QTreeWidgetItem*> list = tree->selectedItems();
+	DECRP(QTreePicDir, tree, m_treePicDir);
 	QTreeWidgetItem* item;
 
-	while (!list.isEmpty()) {
-		item = list.takeFirst();
-		const QString& sDir = item->text(TREE_PICDIR_COLUMN_PATH);
-		picfinder.removePicDir(sDir);
-		updateTreePicCount(sDir);
-		addDirToTree(sDir);
+	if (qApp->keyboardModifiers() == Qt::AltModifier) {
+		for (int i=0 ; i<tree.topLevelItemCount() ; i++) {
+			item = tree.topLevelItem(i);
+
+			const QString& sDir = item->text(TREE_PICDIR_COLUMN_PATH);
+			picfinder.removePicDir(sDir);
+			updateTreePicCount(sDir);
+			addDirToTree(sDir);
+		}
+	} else {
+		QList<QTreeWidgetItem*> list = tree.selectedItems();
+		while (!list.isEmpty()) {
+			item = list.takeFirst();
+
+			const QString& sDir = item->text(TREE_PICDIR_COLUMN_PATH);
+			picfinder.removePicDir(sDir);
+			updateTreePicCount(sDir);
+			addDirToTree(sDir);
+		}
 	}
 }
 
@@ -282,8 +307,8 @@ void QWinMainApp::updateTreePicCount(const QString& sDir)
 	}
 
 	DECOP(QDBMgr, conf, db);
-	QTreePicDir*& tree = m_treePicDir;
-	QList<QTreeWidgetItem*> list = tree->findItems(sDir, Qt::MatchExactly, TREE_PICDIR_COLUMN_PATH);
+	DECRP(QTreePicDir, tree, m_treePicDir);
+	QList<QTreeWidgetItem*> list = tree.findItems(sDir, Qt::MatchExactly, TREE_PICDIR_COLUMN_PATH);
 	QTreeWidgetItem* item;
 
 	if (!list.isEmpty()) {
@@ -292,22 +317,45 @@ void QWinMainApp::updateTreePicCount(const QString& sDir)
 			item = list.takeFirst();
 			item->setText(TREE_PICDIR_COLUMN_PICCOUNT, count);
 		}
+		tree.resizeColumnToContents(TREE_PICDIR_COLUMN_PICCOUNT);
 		qApp->processEvents();
 	}
 }
 
-void QWinMainApp::trayToChangingWall(const QWallPaperParam& wall)
+void QWinMainApp::changingWallPaper(const QWallPaperParam& wall)
 {
+	QString path = QDir::toNativeSeparators(wall.m_path);
 	DECCP(QSystemTrayIcon, tray);
 	tray.setIcon(QIcon(":/icon/icon_changingwall.ico"));
-	tray.setToolTip(tr("Changing: %1").arg(wall.m_path));
+	tray.setToolTip(tr("Changing: %1").arg(path));
 }
 
-void QWinMainApp::trayToChangedWall(const QWallPaperParam& wall)
+void QWinMainApp::changedWallPaper(const QWallPaperParam& wall)
 {
+	QString path = QDir::toNativeSeparators(wall.m_path);
 	DECCP(QSystemTrayIcon, tray);
 	tray.setIcon(QIcon(":/icon/MagicKD.ico"));
-	tray.setToolTip(wall.m_path);
+	tray.setToolTip(path);
+
+	DECCP(QLabel, lblCurWallPath);
+	lblCurWallPath.setText(QDir::toNativeSeparators(path));
+}
+
+void QWinMainApp::treeItemChanged(QTreeWidgetItem* item, int column)
+{
+	if (column == TREE_PICDIR_COLUMN_PATH) {
+		DECCP(QConfMainApp, conf);
+		DECOP(QDBMgr, conf, db);
+		DECOP(QWallMgr, conf, wallmgr);
+
+		const QString& sDir = item->text(TREE_PICDIR_COLUMN_PATH);
+		if (Qt::Checked == item->checkState(column)) {
+			db.setDirEnable(sDir, true);
+		} else {
+			db.setDirEnable(sDir, false);
+		}
+		wallmgr.clearCacheWall();
+	}
 }
 
 void QWinMainApp::trayActivated(QSystemTrayIcon::ActivationReason reason)
@@ -319,5 +367,13 @@ void QWinMainApp::trayActivated(QSystemTrayIcon::ActivationReason reason)
 		activateWindow();
 		tray.hide();
 		break;
+	default:
+		break;
 	}
+}
+
+void QWinMainApp::showWinConf()
+{
+	QWinConfMainApp* winConf = new QWinConfMainApp(*m_conf, this);
+	winConf->show();
 }

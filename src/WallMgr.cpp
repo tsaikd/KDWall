@@ -15,7 +15,14 @@ void QWallPaperParam::_init()
 
 QWallPaperParam& QWallPaperParam::close()
 {
+	if (!m_useOrigin && !m_tmpPath.isEmpty()) {
+		if (!QFile::remove(m_tmpPath)) {
+			QTRACE() << "Remove file" << m_tmpPath << "failed";
+		}
+	}
+
 	m_path.clear();
+	m_tmpPath.clear();
 	_init();
 	return *this;
 }
@@ -29,17 +36,139 @@ bool QWallPaperParam::operator == (const QWallPaperParam& x) const
 	return true;
 }
 
+void QWallCacheMaker::_init()
+{
+}
+
+QWallCacheMaker::~QWallCacheMaker()
+{
+	DECCV(QWallParamList, beMadeWallList);
+	while (!beMadeWallList.isEmpty()) {
+		delete beMadeWallList.takeFirst();
+	}
+}
+
+QWallCacheMaker& QWallCacheMaker::addWall(QWallPaperParam* wall)
+{
+	{
+		QMutexLocker locker(&m_beMadeWallMutex);
+		m_beMadeWallList.append(wall);
+	}
+
+	if (!isRunning())
+		start(QThread::LowestPriority);
+
+	return *this;
+}
+
+/**
+ * @brief fill wall.m_tmpPath, create image file if need
+ **/
+bool QWallCacheMaker::prepareCacheImg(QWallPaperParam& wall)
+{
+	DECCP(QConfMainApp, conf);
+	CDECOP(QDesktopWidget, conf, desk);
+	DECOV(bool, conf, disable_cache_warning);
+	DECOV(QWidget*, conf, mainWidget);
+	CDECOV(QString, wall, path);
+	DECOV(QString, wall, tmpPath);
+	DECOV(bool, wall, useOrigin);
+	QImage img;
+
+	if (useOrigin) {
+		tmpPath = path;
+	} else {
+		QTemporaryFile tmp(QDir::tempPath()+"/"PROJNAME"_XXXXXX.bmp");
+		tmp.setAutoRemove(false);
+		if (!tmp.open()) {
+			QMSGBOX_WARN_CONTROL(disable_cache_warning, mainWidget, PROJNAME, tr("Create tmp file failed"));
+			return false;
+		}
+
+		tmpPath = QDir::toNativeSeparators(tmp.fileName());
+		if (!img.load(path)) {
+			QMSGBOX_WARN_CONTROL(disable_cache_warning, mainWidget, PROJNAME, tr("Load image failed ('%1')").arg(path));
+			return false;
+		}
+		if (img.height() > desk.height()) {
+			img = img.scaledToHeight(desk.height(), Qt::SmoothTransformation);
+		}
+		if (img.width() > desk.width()) {
+			img = img.scaledToWidth(desk.width(), Qt::SmoothTransformation);
+		}
+		if (!img.save(tmpPath, "BMP")) {
+			QMSGBOX_WARN_CONTROL(disable_cache_warning, mainWidget, PROJNAME, tr("Save image to BMP failed ('%1')").arg(tmpPath));
+			return false;
+		}
+	}
+
+	return true;
+}
+
+int QWallCacheMaker::wallListCount()
+{
+	QMutexLocker locker1(&m_beMadeWallMutex);
+	QMutexLocker locker2(m_wallMutex);
+
+	return m_beMadeWallList.count() + m_wallList->count();
+}
+
+void QWallCacheMaker::run()
+{
+	CDECCP(QConfMainApp, conf);
+	DECCV(QWallParamList, beMadeWallList);
+	DECCP(QWallParamList, wallList);
+	QWallPaperParam* wall;
+	QImage img;
+
+	while (!beMadeWallList.isEmpty() && !conf.m_closing) {
+		// fill wall.m_tmpPath, create image file if need
+		{
+			QMutexLocker locker(&m_beMadeWallMutex);
+			wall = beMadeWallList.takeFirst();;
+			QTRACE() << "beMadeWallList:" << beMadeWallList.count();
+		}
+		if (!prepareCacheImg(*wall))
+			continue;
+		{
+			QMutexLocker locker(m_wallMutex);
+			wallList.append(wall);
+			QTRACE() << "wallList:" << wallList.count();
+		}
+	}
+}
+
 void QWallMgr::_init()
 {
+	DECCP(QConfMainApp, conf);
+
+	m_cacheMaker = new QWallCacheMaker(conf, m_wallList, &m_mutex, parent());
+
 	getWallPaper(m_initWall);
 	m_initWall.m_useOrigin = true;
 	m_timerId = 0;
 }
 
+QWallMgr::~QWallMgr()
+{
+	DECCV(QWallPaperParam, initWall);
+	DECCV(QWallParamList, wallList);
+	QWallPaperParam wall;
+
+	getWallPaper(wall);
+	if (wall != initWall) {
+		setWallPaper(initWall);
+	}
+
+	while (!wallList.isEmpty()) {
+		delete wallList.takeFirst();
+	}
+}
+
 bool QWallMgr::getWallPaper(QWallPaperParam& wall)
 {
 	QMutexLocker locker(&m_mutex);
-	typedef QWallPaperParam::STYLE STYLE;
+
 #ifdef Q_WS_WIN
 	QSettings reg("HKEY_CURRENT_USER\\Control Panel\\Desktop", QSettings::NativeFormat);
 
@@ -62,43 +191,30 @@ bool QWallMgr::getWallPaper(QWallPaperParam& wall)
 	return true;
 }
 
+#define RETURN(x) { emit(changedWallPaper(wall)); return (x); }
 bool QWallMgr::setWallPaper(QWallPaperParam& wall)
 {
 	QMutexLocker locker(&m_mutex);
-	CDECCP(QConfMainApp, conf);
-	CDECOP(QDesktopWidget, conf, desk);
 	CDECOV(QString, wall, path);
 	CDECOV(QWallPaperParam::STYLE, wall, style);
+	DECOV(QString, wall, tmpPath);
 	DECOV(bool, wall, useOrigin);
-
-#ifdef Q_WS_WIN
-	// share desktop will clean wallpaper setting, consider the situation
-	QWallPaperParam cur;
-	if (!getWallPaper(cur))
-		return false;
-	if (cur.m_path.isEmpty())
-		return false;
+	QImage img;
 
 	emit(changingWallPaper(wall));
-	QString tmpPath = path;
-	if (!useOrigin) {
-		QTemporaryFile tmp(QDir::tempPath()+"/zzXXXXXX.bmp");
-		tmp.setAutoRemove(false);
-		if (tmp.open()) {
-			tmpPath = QDir::toNativeSeparators(tmp.fileName());
-			QImage img(path);
-			if (img.height() > desk.height()) {
-				img = img.scaledToHeight(desk.height(), Qt::SmoothTransformation);
-			}
-			if (img.width() > desk.width()) {
-				img = img.scaledToWidth(desk.width(), Qt::SmoothTransformation);
-			}
-			img.save(tmpPath, "BMP");
-		} else {
-			QTRACE() << "Create tmpfile failed";
-			tmpPath = path;
-			useOrigin = true;
-		}
+
+	if (tmpPath.isEmpty()) {
+		tmpPath = path;
+		useOrigin = true;
+	}
+
+#ifdef Q_WS_WIN
+	{	// share desktop will clean wallpaper setting, consider the situation
+		QWallPaperParam cur;
+		if (!getWallPaper(cur))
+			RETURN(false);
+		if (cur.m_path.isEmpty())
+			RETURN(false);
 	}
 
 	QSettings reg("HKEY_CURRENT_USER\\Control Panel\\Desktop", QSettings::NativeFormat);
@@ -116,18 +232,15 @@ bool QWallMgr::setWallPaper(QWallPaperParam& wall)
 	SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0
 		, (PVOID)(tmpPath.toAscii().data())
 		, SPIF_SENDWININICHANGE);
-	QTRACE() << path;
 
-	if (!useOrigin) {
-		QFile::remove(tmpPath);
-	}
 	emit(changedWallPaper(wall));
 
-	return true;
+	RETURN(true);
 #endif//Q_WS_WIN
 
-	return false;
+	RETURN(false);
 }
+#undef RETURN
 
 bool QWallMgr::setRandWallPaper()
 {
@@ -136,6 +249,12 @@ bool QWallMgr::setRandWallPaper()
 	DECOP(QDBMgr, conf, db);
 	DECOV(int, conf, wall_timer_sec);
 	DECCV(int, timerId);
+	DECCP(QWallCacheMaker, cacheMaker);
+	DECCV(QWallParamList, wallList);
+	CDECOV(int, conf, max_cache_image);
+	QWallPaperParam* wall;
+	QString path;
+	int retry;
 
 	if (timerId) {
 		killTimer(timerId);
@@ -145,14 +264,40 @@ bool QWallMgr::setRandWallPaper()
 	if (db.getPicCount() <= 0)
 		return false;
 
-	QWallPaperParam wall;
-	wall.m_path = db.getRandPic();
-	wall.m_style = QWallPaperParam::STYLE_CENTER;
-	bool bRes = setWallPaper(wall);
+	if (wallList.isEmpty()) {
+		wall = new QWallPaperParam();
+		retry = 10;
+		do {
+			wall->m_path = db.getRandPic();
+			wall->m_style = QWallPaperParam::STYLE_CENTER;
+		} while (!cacheMaker.prepareCacheImg(*wall) && (retry-- > 0));
+		if (retry <= 0)
+			return false;
+	} else {
+		wall = wallList.takeFirst();
+	}
+
+	bool bRes = setWallPaper(*wall);
+	SAFE_DELETE(wall);
 
 	timerId = startTimer(wall_timer_sec * 1000);
 
+	retry = max_cache_image - cacheMaker.wallListCount();
+	while (retry-- > 0) {
+		wall = new QWallPaperParam();
+		wall->m_path = db.getRandPic();
+		wall->m_style = QWallPaperParam::STYLE_CENTER;
+		cacheMaker.addWall(wall);
+	}
+
 	return bRes;
+}
+
+void QWallMgr::clearCacheWall()
+{
+	QMutexLocker locker(&m_mutex);
+	DECCV(QWallParamList, wallList);
+	wallList.clear();
 }
 
 void QWallMgr::timerEvent(QTimerEvent* e)

@@ -12,7 +12,7 @@ private:
 	void _init();
 public:
 	QPicFinder(QConfMainApp* conf)
-		:	m_conf(conf), QThread((QObject*)conf), m_mutex(QMutex::Recursive)
+		:	QThread((QObject*)conf), m_conf(conf), m_mutex(QMutex::Recursive)
 	{ _init(); }
 
 public slots: // rewrite functions

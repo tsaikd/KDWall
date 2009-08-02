@@ -15,6 +15,7 @@
 #define INIT_DB_DIRLIST \
 	"CREATE TABLE IF NOT EXISTS dirlist " \
 	"( path TEXT PRIMARY KEY"		/* dir path */ \
+	", enable INTEGER DEFAULT 1"	/* enable this dir for randpic */ \
 	");" \
 	""
 
@@ -55,7 +56,7 @@ QDBMgr& QDBMgr::addPic(const QString& path, const QString& dir, int width/* = 0*
 int QDBMgr::getPicCount()
 {
 	QSqlQuery sql;
-	sql.prepare("SELECT count(*) FROM piclist;");
+	sql.prepare("SELECT count(*) FROM piclist LEFT JOIN dirlist WHERE piclist.dir = dirlist.path AND enable = 1;");
 	if (sql.exec()) {
 		if (sql.next()) {
 			return sql.value(0).toInt();
@@ -86,7 +87,7 @@ QString QDBMgr::getRandPic()
 		pichist.clear();
 	}
 
-	sql.prepare("SELECT path FROM piclist LIMIT 1 OFFSET ?;");
+	sql.prepare("SELECT piclist.path FROM piclist LEFT JOIN dirlist WHERE piclist.dir = dirlist.path AND enable = 1 LIMIT 1 OFFSET ?;");
 	sql.addBindValue(num);
 	if (sql.exec()) {
 		if (sql.next()) {
@@ -120,6 +121,36 @@ QDBMgr& QDBMgr::rmDir(const QString& path)
 		QTRACE() << sql.lastError().text();
 	}
 	sql.prepare("DELETE FROM piclist WHERE dir = ?;");
+	sql.addBindValue(path);
+	if (!sql.exec()) {
+		QTRACE() << sql.lastError().text();
+	}
+	QSqlQuery("VACUUM;");
+	return *this;
+}
+
+bool QDBMgr::dirEnable(const QString& path)
+{
+	QSqlQuery sql;
+	sql.prepare("SELECT enable FROM dirlist WHERE path = ?;");
+	sql.addBindValue(path);
+	if (sql.exec()) {
+		if (sql.next()) {
+			if (sql.value(0).toInt() > 0) {
+				return true;
+			}
+		}
+	} else {
+		QTRACE() << sql.lastError().text();
+	}
+	return false;
+}
+
+QDBMgr& QDBMgr::setDirEnable(const QString& path, bool enable)
+{
+	QSqlQuery sql;
+	sql.prepare("UPDATE dirlist SET enable = ? WHERE path = ?;");
+	sql.addBindValue(enable ? "1" : "0");
 	sql.addBindValue(path);
 	if (!sql.exec()) {
 		QTRACE() << sql.lastError().text();

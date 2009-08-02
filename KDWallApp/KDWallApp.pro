@@ -6,7 +6,7 @@ SRCDIR = $${BASEDIR}/src
 INCDIR = $${BASEDIR}/include
 LANGDIR = $${BASEDIR}/lang
 
-QT += sql
+QT *= sql
 
 win32 {
 	LIBS += User32.lib
@@ -23,6 +23,8 @@ SOURCES += $${SRCDIR}/mainApp.cpp
 HEADERS += $${SRCDIR}/WinMainApp.h
 SOURCES += $${SRCDIR}/WinMainApp.cpp
 SOURCES += $${SRCDIR}/ConfMainApp.cpp
+HEADERS += $${SRCDIR}/WinConfMainApp.h
+SOURCES += $${SRCDIR}/WinConfMainApp.cpp
 SOURCES += $${SRCDIR}/Util.cpp
 SOURCES += $${SRCDIR}/DBMgr.cpp
 HEADERS += $${SRCDIR}/WallMgr.h

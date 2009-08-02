@@ -9,6 +9,8 @@ int main(int argc, char* argv[])
 	if (app.sendMessage(QString::number(APPMSG_SHOWGUI)))
 		return 0;
 
+	qsrand(QDateTime::currentDateTime().toTime_t());
+
 	QTranslator lang;
 	lang.load(QString(":/lang/"PROJNAME"_%1.qm").arg(QLocale::system().name()));
 	app.installTranslator(&lang);

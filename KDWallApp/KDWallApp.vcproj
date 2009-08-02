@@ -25,10 +25,10 @@
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="qmake &amp;&amp; nmake debug"
-				ReBuildCommandLine="qmake &amp;&amp; nmake clean-debug debug"
-				CleanCommandLine="nmake clean-debug"
+				ReBuildCommandLine="qmake &amp;&amp; nmake debug-clean debug"
+				CleanCommandLine="nmake debug-clean"
 				Output="KDWallAppd.exe"
-				PreprocessorDefinitions="WIN32;_DEBUG;QT_VERSION"
+				PreprocessorDefinitions="WIN32;_DEBUG;QT_VERSION;Q_WS_WIN"
 				IncludeSearchPath=""
 				ForcedIncludes=""
 				AssemblySearchPath=""
@@ -45,10 +45,10 @@
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="qmake &amp;&amp; nmake release"
-				ReBuildCommandLine="qmake &amp;&amp; nmake clean-release release"
-				CleanCommandLine="nmake clean-release"
+				ReBuildCommandLine="qmake &amp;&amp; nmake release-clean release"
+				CleanCommandLine="nmake release-clean"
 				Output="KDWallApp.exe"
-				PreprocessorDefinitions="WIN32;NDEBUG;QT_VERSION"
+				PreprocessorDefinitions="WIN32;NDEBUG;QT_VERSION;Q_WS_WIN"
 				IncludeSearchPath=""
 				ForcedIncludes=""
 				AssemblySearchPath=""
@@ -98,6 +98,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\WinConfMainApp.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\WinMainApp.cpp"
 				>
 			</File>
@@ -141,6 +145,10 @@
 			</File>
 			<File
 				RelativePath="..\src\WallMgr.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\WinConfMainApp.h"
 				>
 			</File>
 			<File

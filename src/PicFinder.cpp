@@ -3,12 +3,30 @@
 #include "ConfMainApp.h"
 #include "DBMgr.h"
 
+#define CHECK_SUPPORTED_IMAGE_FORMAT(fmt) \
+	if (list.contains(fmt)) { \
+		m_dirNameFilters << "*."fmt; \
+	} else { \
+		if (!conf.m_ignoreImageFormatSupportWarning) { \
+			if (QMessageBox::Ignore == QMessageBox::warning(&mainWidget, PROJNAME \
+				, tr("System does not support image format %1").arg(QString(fmt).toUpper()) \
+				, QMessageBox::Ok|QMessageBox::Ignore)) { \
+				conf.m_ignoreImageFormatSupportWarning = true; \
+			} \
+		} \
+	}
+
+
 void QPicFinder::_init()
 {
-	m_dirNameFilters << "*.bmp";
-	m_dirNameFilters << "*.jpg";
-	m_dirNameFilters << "*.jpeg";
-	m_dirNameFilters << "*.png";
+	DECCP(QConfMainApp, conf);
+	DECOP(QWidget, conf, mainWidget);
+	QList<QByteArray> list = QImageReader::supportedImageFormats();
+
+	CHECK_SUPPORTED_IMAGE_FORMAT("bmp");
+	CHECK_SUPPORTED_IMAGE_FORMAT("jpg");
+	CHECK_SUPPORTED_IMAGE_FORMAT("jpeg");
+	CHECK_SUPPORTED_IMAGE_FORMAT("png");
 }
 
 void QPicFinder::start(Priority priority/* = InheritPriority*/)

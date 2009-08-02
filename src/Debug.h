@@ -6,8 +6,8 @@
  * Support for IDE msvc2005 msvc2008
  *
  * @author tsaikd@gmail.com
- * @version 1.0.0.0
- * @date 2009/07/31
+ * @version 1.0.0.1
+ * @date 2009/08/02
  **/
 
 #ifndef _GENERAL_DEBUG_H
@@ -220,6 +220,12 @@
 #ifndef CDECOP
 	#define CDECOP(type, base, var)		const type& var = *(base).m_##var	// declare other class const variable pointer
 #endif//CDECOP
+#ifndef DECRV
+	#define DECRV(type, var, member)	type& var = (member)				// declare renamed variable pointer
+#endif//DECRV
+#ifndef DECRP
+	#define DECRP(type, var, member)	type& var = *(member)				// declare renamed variable pointer
+#endif//DECRP
 #ifndef DEWRV
 	// declare and write renamed variable with new value
 	#define DEWRV(type, var, member, val) \
