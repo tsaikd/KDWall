@@ -7,6 +7,20 @@ class QWallMgr;
 class QPicFinder;
 class QDBMgr;
 
+#ifdef Q_WS_X11
+	enum WM {
+		WM_UNKNOWN,
+		WM_KDE3,
+		WM_KDE4,
+		WM_GNOME,
+		WM_XFCE,
+		WM_FLUXBOX,
+		WM_FVWM,
+		WM_BLACKBOX,
+		WM_WINDOWMAKER,
+	};
+#endif//Q_WS_X11
+
 class QConfMainApp : public QObject
 {
 private:
@@ -37,6 +51,13 @@ public:
 	int		m_picfinder_refresh_msec;				// ini conf
 
 	QDesktopWidget* m_desk;
+
+#ifdef Q_WS_X11
+public:
+	WM		m_wm;									// ini conf
+protected:
+	void autoDetectWM();
+#endif//Q_WS_X11
 
 protected:
 	QMap<QString, QVariant> m_mapConfDefValue;
