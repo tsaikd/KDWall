@@ -171,23 +171,20 @@ void QWinMainApp::closeEvent(QCloseEvent* e)
 	QWidget::closeEvent(e);
 }
 
-#ifdef Q_WS_WIN
-#include <Windows.h>
-bool QWinMainApp::winEvent(MSG* message, long* result)
+void QWinMainApp::changeEvent(QEvent* e)
 {
-	switch (message->message) {
-	case WM_SYSCOMMAND:
-		if (message->wParam == SC_MINIMIZE) {
+	if (e->type() == QEvent::WindowStateChange) {
+		if (isMinimized()) {
+			QEvent* e = new QEvent(QEvent::WindowStateChange);
+			showNormal();
+			hide();
+			qApp->postEvent(this, e);
+
 			DECCP(QSystemTrayIcon, tray);
 			tray.show();
-			hide();
-			return true;
 		}
-		break;
 	}
-	return QWidget::winEvent(message, result);
 }
-#endif//Q_WS_WIN
 
 void QWinMainApp::handleAppMessage(const QString& sMsg)
 {
