@@ -6,8 +6,8 @@
  * Support for IDE msvc2005 msvc2008
  *
  * @author tsaikd@gmail.com
- * @version 1.0.0.1
- * @date 2009/08/02
+ * @version 1.0.0.2
+ * @date 2009/08/03
  **/
 
 #ifndef _GENERAL_DEBUG_H
@@ -63,6 +63,7 @@
 	#define DLOG2(fmt, arg1, arg2) { if (g_fpDebugLog) { DLOGFUNCLINE(); fprintf(g_fpDebugLog, fmt"\n", arg1, arg2); fflush(g_fpDebugLog); } }
 	#define DLOG3(fmt, arg1, arg2, arg3) { if (g_fpDebugLog) { DLOGFUNCLINE(); fprintf(g_fpDebugLog, fmt"\n", arg1, arg2, arg3); fflush(g_fpDebugLog); } }
 	#define DLOG4(fmt, arg1, arg2, arg3, arg4) { if (g_fpDebugLog) { DLOGFUNCLINE(); fprintf(g_fpDebugLog, fmt"\n", arg1, arg2, arg3, arg4); fflush(g_fpDebugLog); } }
+	#define DLOG5(fmt, arg1, arg2, arg3, arg4, arg5) { if (g_fpDebugLog) { DLOGFUNCLINE(); fprintf(g_fpDebugLog, fmt"\n", arg1, arg2, arg3, arg4, arg5); fflush(g_fpDebugLog); } }
 #endif//DEBUG
 
 #ifdef QT_VERSION
@@ -72,6 +73,17 @@
 	#else//QT_NO_DEBUG_OUTPUT
 		#define QTRACE qDebug
 	#endif//QT_NO_DEBUG_OUTPUT
+	#ifndef WIN32
+		#define TRACEL() QTRACE()
+		#define TRACEN() qDebug()
+
+		#define TRACE0(msg) (QTRACE() << msg)
+		#define TRACE1(fmt, arg1) (QTRACE() << qDebug(fmr, arg1))
+		#define TRACE2(fmt, arg1, arg2) (QTRACE() << qDebug(fmr, arg1, arg2))
+		#define TRACE3(fmt, arg1, arg2, arg3) (QTRACE() << qDebug(fmr, arg1, arg2, arg3))
+		#define TRACE4(fmt, arg1, arg2, arg3, arg4) (QTRACE() << qDebug(fmr, arg1, arg2, arg3, arg4))
+		#define TRACE5(fmt, arg1, arg2, arg3, arg4, arg5) (QTRACE() << qDebug(fmr, arg1, arg2, arg3, arg4, arg5))
+	#endif//WIN32
 #endif//QT_VERSION
 
 #ifndef QTRACE
