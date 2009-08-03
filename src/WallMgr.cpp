@@ -75,6 +75,11 @@ bool QWallCacheMaker::prepareCacheImg(QWallPaperParam& wall)
 	DECOV(bool, wall, useOrigin);
 	QImage img;
 
+#if defined(Q_WS_X11)
+	// ubuntu support set wallpaper with jpeg format
+	useOrigin = true;
+#endif//defined(Q_WS_X11)
+
 	if (useOrigin) {
 		tmpPath = path;
 	} else {
@@ -168,11 +173,11 @@ QWallMgr::~QWallMgr()
 bool QWallMgr::getWallPaper(QWallPaperParam& wall)
 {
 	QMutexLocker locker(&m_mutex);
+	wall.close();
 
-#ifdef Q_WS_WIN
+#if defined(Q_WS_WIN)
 	QSettings reg("HKEY_CURRENT_USER\\Control Panel\\Desktop", QSettings::NativeFormat);
 
-	wall.close();
 	wall.m_path = reg.value("Wallpaper").toString();
 	int style = reg.value("WallpaperStyle").toInt();
 	int tile = reg.value("TileWallpaper").toInt();
@@ -186,9 +191,55 @@ bool QWallMgr::getWallPaper(QWallPaperParam& wall)
 		// style == 2
 		wall.m_style = QWallPaperParam::STYLE_EXPAND;
 	}
-#endif//Q_WS_WIN
-
 	return true;
+#elif defined(Q_WS_X11)
+	DECCP(QConfMainApp, conf);
+	QStringList args;
+	QString procout;
+	switch (conf.m_wm) {
+	case WM_GNOME:
+		{
+			QProcess proc;
+			proc.setProcessChannelMode(QProcess::MergedChannels);
+			args.clear();
+			args << "--get" << "/desktop/gnome/background/picture_filename";
+			proc.start("gconftool-2", args);
+			if (proc.waitForFinished()) {
+				procout = proc.readAll();
+				procout = procout.trimmed();
+				wall.m_path = procout;
+			} else {
+				QTRACE() << proc.errorString();
+				return false;
+			}
+		}
+		{
+			QProcess proc;
+			proc.setProcessChannelMode(QProcess::MergedChannels);
+			args.clear();
+			args << "--get" << "/desktop/gnome/background/picture_options";
+			proc.start("gconftool-2", args);
+			if (proc.waitForFinished()) {
+				procout = proc.readAll();
+				procout = procout.trimmed();
+				if (procout == "centered") {
+					wall.m_style = QWallPaperParam::STYLE_CENTER;
+				} else {
+					DNOTIMP();
+					return false;
+				}
+			} else {
+				QTRACE() << proc.errorString();
+				return false;
+			}
+		}
+		return true;
+	default:
+		break;
+	}
+#endif//Q_WS_*
+
+	return false;
 }
 
 #define RETURN(x) { emit(changedWallPaper(wall)); return (x); }
@@ -208,7 +259,7 @@ bool QWallMgr::setWallPaper(QWallPaperParam& wall)
 		useOrigin = true;
 	}
 
-#ifdef Q_WS_WIN
+#if defined(Q_WS_WIN)
 	{	// share desktop will clean wallpaper setting, consider the situation
 		QWallPaperParam cur;
 		if (!getWallPaper(cur))
@@ -236,7 +287,70 @@ bool QWallMgr::setWallPaper(QWallPaperParam& wall)
 	emit(changedWallPaper(wall));
 
 	RETURN(true);
-#endif//Q_WS_WIN
+#elif defined(Q_WS_X11)
+	DECCP(QConfMainApp, conf);
+	QStringList args;
+	QFile textFile;
+	QTextStream textStream;
+	switch (conf.m_wm) {
+	case WM_KDE3:
+		args << "kdesktop" << "KBackgroundIface" << "setWallpaper"
+			<< tmpPath << "1";
+		QProcess::execute("dcop", args);
+		RETURN(true);
+	case WM_KDE4:
+		textFile.setFileName(QDir::homePath() + "/.wally/wallykde4.img");
+		textFile.open(QIODevice::WriteOnly);
+		textStream.setDevice(&textFile);
+
+		textStream << tmpPath << endl;
+		textFile.close();
+		RETURN(true);
+	case WM_GNOME:
+		args << "--type" << "bool" << "--set" <<
+			"/desktop/gnome/background/draw_background" << "true";
+		QProcess::execute("gconftool-2", args);
+		args.clear();
+		args << "--type" << "string" << "--set" <<
+			"/desktop/gnome/background/picture_options" << "centered";
+		QProcess::execute("gconftool-2", args);
+		args.clear();
+		args << "--type" << "string" << "--set" <<
+			"/desktop/gnome/background/picture_filename" << tmpPath;
+		QProcess::execute("gconftool-2", args);
+		RETURN(true);
+	case WM_XFCE:
+		textFile.setFileName(QDir::homePath() + "/.config/xfce4/desktop/backdrops.list");
+		textFile.open(QIODevice::WriteOnly);
+		textStream.setDevice(&textFile);
+
+		textStream << "# xfce backdrop list" << endl;
+		textStream << tmpPath << endl;
+		textFile.close();
+
+		args << "--reload";
+		QProcess::execute("xfdesktop", args);
+		RETURN(true);
+	case WM_FLUXBOX:
+		args << "-c" << tmpPath;
+		QProcess::execute("fbsetbg", args);
+		RETURN(true);
+	case WM_FVWM:
+		args << tmpPath;
+		QProcess::execute("fvwm-root", args);
+		RETURN(true);
+	case WM_BLACKBOX:
+		args << "-center" << tmpPath;
+		QProcess::execute("bsetbg", args);
+		RETURN(true);
+	case WM_WINDOWMAKER:
+		args << "-e" << tmpPath;
+		QProcess::execute("wmsetbg",args);
+		RETURN(true);
+	default:
+		RETURN(false);
+	}
+#endif//Q_WS_*
 
 	RETURN(false);
 }

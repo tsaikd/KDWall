@@ -174,14 +174,18 @@ void QWinMainApp::closeEvent(QCloseEvent* e)
 void QWinMainApp::changeEvent(QEvent* e)
 {
 	if (e->type() == QEvent::WindowStateChange) {
-		if (isMinimized()) {
-			QEvent* e = new QEvent(QEvent::WindowStateChange);
-			showNormal();
-			hide();
-			qApp->postEvent(this, e);
-
+		if (e->spontaneous()) {
+			QWindowStateChangeEvent* e1 = (QWindowStateChangeEvent*)e;
+			QTRACE() << e1->oldState();
 			DECCP(QSystemTrayIcon, tray);
-			tray.show();
+			if (isMinimized()) {
+				m_rect = geometry();
+#if defined(Q_WS_WIN)
+				setWindowFlags((windowFlags() | Qt::FramelessWindowHint) & (~Qt::Window));
+#endif//defined(Q_WS_WIN)
+				hide();
+				tray.show();
+			}
 		}
 	}
 }
@@ -360,9 +364,14 @@ void QWinMainApp::trayActivated(QSystemTrayIcon::ActivationReason reason)
 	DECCP(QSystemTrayIcon, tray);
 	switch (reason) {
 	case QSystemTrayIcon::Trigger:
-		show();
+#if defined(Q_WS_WIN)
+		setWindowFlags((windowFlags() | Qt::Window) & (~Qt::FramelessWindowHint));
+#endif//defined(Q_WS_WIN)
+		showNormal();
 		activateWindow();
 		tray.hide();
+		if (m_rect.isValid())
+			setGeometry(m_rect);
 		break;
 	default:
 		break;

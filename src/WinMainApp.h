@@ -51,6 +51,7 @@ protected:
 	QComboBox* m_cboProfile;
 	QTreePicDir* m_treePicDir;
 	QLabel* m_lblCurWallPath;
+	QRect m_rect; // used for restore minimized window geometry
 };
 
 #endif//_KDWALL_WINMAINAPP_H
