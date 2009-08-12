@@ -79,9 +79,9 @@ void QPicFinder::run()
 {
 	DECCP(QConfMainApp, conf);
 	DECOP(QDBMgr, conf, db);
-	CDECOV(bool, conf, closing);
-	CDECOV(int, conf, picfinder_refresh_msec);
-	CDECOV(bool, conf, closingPicfinder);
+	CDCOV(bool, conf, closing);
+	CDCOV(int, conf, picfinder_refresh_msec);
+	CDCOV(bool, conf, closingPicfinder);
 	DECCV(QStringList, dirNameFilters);
 	DECCV(QStringList, dirList);
 	QString sDir;

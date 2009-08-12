@@ -29,7 +29,7 @@ public:
 protected:
 	QConfMainApp* m_conf;
 	QSqlDatabase m_db;
-	QList<int> m_pichist;
+	QStringList m_pichist;
 };
 
 #endif//_KDWALL_DBMGR_H

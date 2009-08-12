@@ -70,33 +70,35 @@ int QDBMgr::getPicCount()
 QString QDBMgr::getRandPic()
 {
 	DECCP(QConfMainApp, conf);
-	DECCV(QList<int>, pichist);
+	DECCV(QStringList, pichist);
+	CDCOV(int, conf, pichist_max_num);
 	QString path;
 	QSqlQuery sql;
-	int count = getPicCount();
-	int num = qrand() % count;
+	int retry = 10;
 
-	while (pichist.count() > conf.m_pichist_max_num) {
+	while (pichist.count() > pichist_max_num) {
 		pichist.takeFirst();
 	}
-	if (count > (pichist.count()<<1)) {
-		while (pichist.contains(num)) {
-			num = qrand() % count;
+
+	do {
+		sql.prepare("SELECT piclist.path FROM piclist LEFT JOIN dirlist WHERE piclist.dir = dirlist.path AND enable = 1 LIMIT 1 OFFSET (abs(random()) %"
+			"(SELECT count(*) FROM piclist LEFT JOIN dirlist WHERE piclist.dir = dirlist.path AND enable = 1));");
+		if (sql.exec()) {
+			if (sql.next()) {
+				path = sql.value(0).toString();
+			}
+		} else {
+			QTRACE() << sql.lastError().text();
 		}
+	} while (pichist.contains(path) && (--retry > 0));
+
+	if (retry > 0) {
+		pichist.append(path);
 	} else {
-		pichist.clear();
+		if (getPicCount() < pichist_max_num)
+			pichist.clear();
 	}
 
-	sql.prepare("SELECT piclist.path FROM piclist LEFT JOIN dirlist WHERE piclist.dir = dirlist.path AND enable = 1 LIMIT 1 OFFSET ?;");
-	sql.addBindValue(num);
-	if (sql.exec()) {
-		if (sql.next()) {
-			path = sql.value(0).toString();
-		}
-	} else {
-		QTRACE() << sql.lastError().text();
-	}
-	pichist.append(num);
 	return path;
 }
 

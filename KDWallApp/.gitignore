@@ -1,0 +1,11 @@
+/KDWall.db
+/*.dll
+/*.exe
+/*.manifest
+/KDWallApp
+/KDWallAppd
+/Makefile*
+/[Dd]ebug/
+/[Rr]elease/
+/tmp
+

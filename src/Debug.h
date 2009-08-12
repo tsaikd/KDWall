@@ -6,8 +6,8 @@
  * Support for IDE msvc2005 msvc2008
  *
  * @author tsaikd@gmail.com
- * @version 1.0.0.2
- * @date 2009/08/03
+ * @version 1.0.0.5
+ * @date 2009/08/12
  **/
 
 #ifndef _GENERAL_DEBUG_H
@@ -28,17 +28,18 @@
 	#ifdef WIN32
 		#include <windows.h>
 		#include <crtdbg.h>
-		#define TRACEFUNCLINE() { sprintf_s(g_debugBuf, DEBUG_BUFSIZE, "%s():%d: ", __PRETTY_FUNCTION__, __LINE__); OutputDebugStringA(g_debugBuf); }
-		#define TRACEL() { TRACEFUNCLINE(); OutputDebugStringA("\n"); }
-		#define TRACEN() { OutputDebugStringA("\n"); }
-		#define TRACED(var) { TRACE2("%-60s (%3d)", #var, (int)var); }
+		#define TRACES(msg) OutputDebugStringA(msg)
+		#define TRACEN() TRACES("\n")
+		#define TRACEFUNCLINE() { sprintf_s(g_debugBuf, DEBUG_BUFSIZE, "%s():%d: ", __PRETTY_FUNCTION__, __LINE__); TRACES(g_debugBuf); }
+		#define TRACEL() { TRACEFUNCLINE(); TRACEN(); }
+		#define TRACE1S(fmt, arg1) { sprintf_s(g_debugBuf, DEBUG_BUFSIZE, fmt, arg1); TRACES(g_debugBuf); }
 
-		#define TRACE0(msg) { TRACEFUNCLINE(); OutputDebugStringA(msg"\n"); }
-		#define TRACE1(fmt, arg1) { TRACEFUNCLINE(); sprintf_s(g_debugBuf, DEBUG_BUFSIZE, fmt"\n", arg1); OutputDebugStringA(g_debugBuf); }
-		#define TRACE2(fmt, arg1, arg2) { TRACEFUNCLINE(); sprintf_s(g_debugBuf, DEBUG_BUFSIZE, fmt"\n", arg1, arg2); OutputDebugStringA(g_debugBuf); }
-		#define TRACE3(fmt, arg1, arg2, arg3) { TRACEFUNCLINE(); sprintf_s(g_debugBuf, DEBUG_BUFSIZE, fmt"\n", arg1, arg2, arg3); OutputDebugStringA(g_debugBuf); }
-		#define TRACE4(fmt, arg1, arg2, arg3, arg4) { TRACEFUNCLINE(); sprintf_s(g_debugBuf, DEBUG_BUFSIZE, fmt"\n", arg1, arg2, arg3, arg4); OutputDebugStringA(g_debugBuf); }
-		#define TRACE5(fmt, arg1, arg2, arg3, arg4, arg5) { TRACEFUNCLINE(); sprintf_s(g_debugBuf, DEBUG_BUFSIZE, fmt"\n", arg1, arg2, arg3, arg4, arg5); OutputDebugStringA(g_debugBuf); }
+		#define TRACE0(msg) { TRACEFUNCLINE(); TRACES(msg"\n"); }
+		#define TRACE1(fmt, arg1) { TRACEFUNCLINE(); sprintf_s(g_debugBuf, DEBUG_BUFSIZE, fmt"\n", arg1); TRACES(g_debugBuf); }
+		#define TRACE2(fmt, arg1, arg2) { TRACEFUNCLINE(); sprintf_s(g_debugBuf, DEBUG_BUFSIZE, fmt"\n", arg1, arg2); TRACES(g_debugBuf); }
+		#define TRACE3(fmt, arg1, arg2, arg3) { TRACEFUNCLINE(); sprintf_s(g_debugBuf, DEBUG_BUFSIZE, fmt"\n", arg1, arg2, arg3); TRACES(g_debugBuf); }
+		#define TRACE4(fmt, arg1, arg2, arg3, arg4) { TRACEFUNCLINE(); sprintf_s(g_debugBuf, DEBUG_BUFSIZE, fmt"\n", arg1, arg2, arg3, arg4); TRACES(g_debugBuf); }
+		#define TRACE5(fmt, arg1, arg2, arg3, arg4, arg5) { TRACEFUNCLINE(); sprintf_s(g_debugBuf, DEBUG_BUFSIZE, fmt"\n", arg1, arg2, arg3, arg4, arg5); TRACES(g_debugBuf); }
 
 		#define ASSERT(expr) ((!!(expr)) || \
                 (1 != _CrtDbgReportW(_CRT_ASSERT, _CRT_WIDE(__FILE__), __LINE__, NULL, _CRT_WIDE(#expr))) || \
@@ -69,13 +70,15 @@
 #ifdef QT_VERSION
 	#include <QtCore/QDebug>
 	#ifndef QT_NO_DEBUG_OUTPUT
-		#define QTRACE() (qDebug().nospace() << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":").space()
+		#define QTRACE() ((qDebug().nospace() << __PRETTY_FUNCTION__ << ":" << __LINE__ << ":").space())
 	#else//QT_NO_DEBUG_OUTPUT
 		#define QTRACE qDebug
 	#endif//QT_NO_DEBUG_OUTPUT
 	#ifndef WIN32
-		#define TRACEL() QTRACE()
+		#define TRACES(msg) qDebug(msg)
 		#define TRACEN() qDebug()
+		#define TRACEL() QTRACE()
+		#define TRACE1S(fmt, arg1) qDebug(fmt, arg1)
 
 		#define TRACE0(msg) (QTRACE() << msg)
 		#define TRACE1(fmt, arg1) (QTRACE() << qDebug(fmr, arg1))
@@ -83,25 +86,89 @@
 		#define TRACE3(fmt, arg1, arg2, arg3) (QTRACE() << qDebug(fmr, arg1, arg2, arg3))
 		#define TRACE4(fmt, arg1, arg2, arg3, arg4) (QTRACE() << qDebug(fmr, arg1, arg2, arg3, arg4))
 		#define TRACE5(fmt, arg1, arg2, arg3, arg4, arg5) (QTRACE() << qDebug(fmr, arg1, arg2, arg3, arg4, arg5))
+
+		#define TRACED(var) TRACE2("%-60s (%3d)", #var, (int)var)
 	#endif//WIN32
 #endif//QT_VERSION
+
+#ifdef TRACE2
+	#define TRACED(var) TRACE2("%-60s (%3d)", #var, (int)var)
+#endif//TRACE2
+
+#if defined(TRACES) && defined(TRACEN) && defined(TRACE1S)
+	/**
+	 * @brief Trace all elements in array
+	 * @note if var_num_per_line < 0 will force insert a newline before data
+	 * @code
+	 *   int iarr[100];
+	 *   // ... fill integer array iarr
+	 *   TRACEARR(int, iarr, "%d", 100, 10);
+	 * @endcode
+	 **/
+	#define TRACEARR(sym_type, arr, sym_fmt, sym_num, var_num_per_line) { \
+			int _lnum = 0; \
+			int _vnpl = ((var_num_per_line) > 0) ? (var_num_per_line) : -(var_num_per_line); \
+			TRACES(#arr":"); \
+			if ((sym_num) > (var_num_per_line)) { \
+				TRACEN(); \
+			} else { \
+				TRACES("\t"); \
+			} \
+			for (int _i=0 ; _i<(sym_num) ; _i++) { \
+				if (_lnum++ >= _vnpl) { \
+					TRACEN(); \
+					_lnum = 1; \
+				} \
+				TRACE1S(" "sym_fmt, (sym_type)(arr[_i])); \
+			} \
+			TRACEN(); \
+		}
+#endif//defined(TRACES) && defined(TRACEN) && defined(TRACE1S)
+
+#if defined(TRACE0) && defined(TRACE1S) && defined(TRACEN)
+	/**
+	 * @brief Trace sub elements in 2D-array
+	 * @note MxN == YxX == array[y][x]
+	 **/
+	#define TRACEARR_S2D(sym_type, arr, sym_fmt, start_y, start_x, height, width) { \
+			int _sy = (start_y); \
+			int _sx = (start_x); \
+			int _sh = _sy + (height); \
+			int _sw = _sx + (width); \
+			TRACE0(#arr":"); \
+			for (int _j=_sy ; _j<_sh ; _j++) { \
+				for (int _i=_sx ; _i<_sw ; _i++) { \
+					TRACE1S(" "sym_fmt, arr[_j][_i]); \
+				} \
+				TRACEN(); \
+			} \
+		}
+	/**
+	 * @brief Trace all elements in 2D-array
+	 * @see TRACEARR_S2D
+	 **/
+	#define TRACEARR_2D(sym_type, arr, sym_fmt, m, n) TRACEARR_S2D(sym_type, arr, sym_fmt, 0, 0, m, n)
+#endif//defined(TRACE0) && defined(TRACE1S) && defined(TRACEN)
 
 #ifndef QTRACE
 	#define QTRACE()
 #endif//QTRACE
 
+#ifndef TRACES
+	#define TRACES(msg)
+#endif//TRACES
+#ifndef TRACEN
+	#define TRACEN()
+#endif//TRACEN
 #ifndef TRACEFUNCLINE
 	#define TRACEFUNCLINE()
 #endif//TRACEFUNCLINE
 #ifndef TRACEL
 	#define TRACEL()
 #endif//TRACEL
-#ifndef TRACEN
-	#define TRACEN()
-#endif//TRACEN
-#ifndef TRACED
-	#define TRACED(var)
-#endif//TRACED
+#ifndef TRACE1S
+	#define TRACE1S(fmt, arg1)
+#endif//TRACE1S
 
 #ifndef TRACE0
 	#define TRACE0(msg)
@@ -121,6 +188,19 @@
 #ifndef TRACE5
 	#define TRACE5(fmt, arg1, arg2, arg3, arg4, arg5)
 #endif//TRACE5
+
+#ifndef TRACED
+	#define TRACED(var)
+#endif//TRACED
+#ifndef TRACEARR
+	#define TRACEARR(sym_type, arr, sym_fmt, sym_num, var_num_per_line)
+#endif//TRACEARR
+#ifndef TRACEARR_S2D
+	#define TRACEARR_S2D(sym_type, arr, sym_fmt, start_y, start_x, height, width)
+#endif//TRACEARR_S2D
+#ifndef TRACEARR_2D
+	#define TRACEARR_2D(sym_type, arr, sym_fmt, m, n)
+#endif//TRACEARR_2D
 
 #ifdef DEBUG
 	#ifndef ASSERT
@@ -220,24 +300,30 @@
 #ifndef DECOP
 	#define DECOP(type, base, var)		type& var = *(base).m_##var			// declare other class variable pointer
 #endif//DECOP
-#ifndef CDECCV
-	#define CDECCV(type, var)			const type& var = m_##var			// declare current class const variable
-#endif//CDECCV
-#ifndef CDECCP
-	#define CDECCP(type, var)			const type& var = *m_##var			// declare current class const variable pointer
-#endif//CDECCP
-#ifndef CDECOV
-	#define CDECOV(type, base, var)		const type& var = (base).m_##var	// declare other class const variable
-#endif//CDECOV
-#ifndef CDECOP
-	#define CDECOP(type, base, var)		const type& var = *(base).m_##var	// declare other class const variable pointer
-#endif//CDECOP
 #ifndef DECRV
-	#define DECRV(type, var, member)	type& var = (member)				// declare renamed variable pointer
+	#define DECRV(type, var, member)	type& var = (member)				// declare renamed variable
 #endif//DECRV
 #ifndef DECRP
 	#define DECRP(type, var, member)	type& var = *(member)				// declare renamed variable pointer
 #endif//DECRP
+#ifndef CDCCV
+	#define CDCCV(type, var)			const type& var = m_##var			// declare current class const variable
+#endif//CDCCV
+#ifndef CDCCP
+	#define CDCCP(type, var)			const type& var = *m_##var			// declare current class const variable pointer
+#endif//CDCCP
+#ifndef CDCOV
+	#define CDCOV(type, base, var)		const type& var = (base).m_##var	// declare other class const variable
+#endif//CDCOV
+#ifndef CDCOP
+	#define CDCOP(type, base, var)		const type& var = *(base).m_##var	// declare other class const variable pointer
+#endif//CDCOP
+#ifndef CDCRV
+	#define CDCRV(type, var, member)	const type& var = (member)			// declare renamed variable
+#endif//CDCRV
+#ifndef CDCRP
+	#define CDCRP(type, var, member)	const type& var = *(member)			// declare renamed variable pointer
+#endif//CDCRP
 #ifndef DEWRV
 	// declare and write renamed variable with new value
 	#define DEWRV(type, var, member, val) \
@@ -250,5 +336,24 @@
 		member = (val); \
 		type& var = *member
 #endif//DEWRP
+#ifndef DEWRA_2D
+	/**
+	 * @see TRACEARR_S2D
+	 **/
+	#define DEWRA_2D(type, var, m, n, member) { \
+			type* _p; \
+			int _m = (m); \
+			int _n = (n); \
+			int size = _m*sizeof(type*) + _m*_n*sizeof(type); \
+			member = (type**)malloc(size); \
+			memset(member, 0, size); \
+			_p = (type*)(member+_m); \
+			for (int _i=0 ; _i<_m ; _i++) { \
+				member[_i] = _p; \
+				_p+=_n; \
+			} \
+		} \
+		type**& var = member
+#endif//DEWRA_2D
 
 #endif//_GENERAL_DEBUG_H

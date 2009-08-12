@@ -67,10 +67,10 @@ QWallCacheMaker& QWallCacheMaker::addWall(QWallPaperParam* wall)
 bool QWallCacheMaker::prepareCacheImg(QWallPaperParam& wall)
 {
 	DECCP(QConfMainApp, conf);
-	CDECOP(QDesktopWidget, conf, desk);
+	CDCOP(QDesktopWidget, conf, desk);
 	DECOV(bool, conf, disable_cache_warning);
 	DECOV(QWidget*, conf, mainWidget);
-	CDECOV(QString, wall, path);
+	CDCOV(QString, wall, path);
 	DECOV(QString, wall, tmpPath);
 	DECOV(bool, wall, useOrigin);
 	QImage img;
@@ -120,7 +120,7 @@ int QWallCacheMaker::wallListCount()
 
 void QWallCacheMaker::run()
 {
-	CDECCP(QConfMainApp, conf);
+	CDCCP(QConfMainApp, conf);
 	DECCV(QWallParamList, beMadeWallList);
 	DECCP(QWallParamList, wallList);
 	QWallPaperParam* wall;
@@ -246,8 +246,8 @@ bool QWallMgr::getWallPaper(QWallPaperParam& wall)
 bool QWallMgr::setWallPaper(QWallPaperParam& wall)
 {
 	QMutexLocker locker(&m_mutex);
-	CDECOV(QString, wall, path);
-	CDECOV(QWallPaperParam::STYLE, wall, style);
+	CDCOV(QString, wall, path);
+	CDCOV(QWallPaperParam::STYLE, wall, style);
 	DECOV(QString, wall, tmpPath);
 	DECOV(bool, wall, useOrigin);
 	QImage img;
@@ -365,7 +365,7 @@ bool QWallMgr::setRandWallPaper()
 	DECCV(int, timerId);
 	DECCP(QWallCacheMaker, cacheMaker);
 	DECCV(QWallParamList, wallList);
-	CDECOV(int, conf, max_cache_image);
+	CDCOV(int, conf, max_cache_image);
 	QWallPaperParam* wall;
 	QString path;
 	int retry;

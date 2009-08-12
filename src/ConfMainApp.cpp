@@ -30,7 +30,7 @@ void QConfMainApp::_init()
 	DECCP(QSettings, conf);
 	m_mainWidget = NULL;
 	m_closing = false;
-	LOAD_CONFIG(initWithoutWindow, "1");
+	LOAD_CONFIG(initWithoutWindow, "0");
 
 	// QDBMgr
 	LOAD_CONFIG(pichist_max_num, "100");
