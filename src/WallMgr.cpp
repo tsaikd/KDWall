@@ -1,5 +1,6 @@
 #include "WallMgr.h"
 
+#include "Util.h"
 #include "ConfMainApp.h"
 #include "DBMgr.h"
 
@@ -369,6 +370,9 @@ bool QWallMgr::setRandWallPaper()
 	QWallPaperParam* wall;
 	QString path;
 	int retry;
+
+	if (!QUtil::isDesktopVisible())
+		return false;
 
 	if (timerId) {
 		killTimer(timerId);
