@@ -14,7 +14,7 @@ win32 {
 
 TRANSLATIONS += $${LANGDIR}/KDWall_zh_TW.ts
 RESOURCES += $${BASEDIR}/KDWall.qrc
-RC_FILE = $${BASEDIR}/KDWall.rc
+RC_FILE = KDWallApp.rc
 
 PRECOMPILED_HEADER += $${SRCDIR}/stable.h
 
