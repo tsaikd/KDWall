@@ -20,6 +20,8 @@ void QWinMainApp::_init()
 	DECCV(bool, bFirstChangeWallPaper);
 	bFirstChangeWallPaper = false;
 
+	setWindowTitle(QString("%1 %2").arg(qAppName()).arg(qApp->applicationVersion()));
+
 	QAction* act = new QAction(this);
 	act->setShortcut(Qt::Key_Escape);
 	addAction(act);

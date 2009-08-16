@@ -16,10 +16,11 @@ TRANSLATIONS += $${LANGDIR}/KDWall_zh_TW.ts
 RESOURCES += $${BASEDIR}/KDWall.qrc
 RC_FILE = KDWallApp.rc
 
+INCLUDEPATH += $${SRCDIR}
 PRECOMPILED_HEADER += $${SRCDIR}/stable.h
 
+SOURCES += main.cpp
 SOURCES += $${SRCDIR}/Debug.cpp
-SOURCES += $${SRCDIR}/mainApp.cpp
 HEADERS += $${SRCDIR}/WinMainApp.h
 SOURCES += $${SRCDIR}/WinMainApp.cpp
 SOURCES += $${SRCDIR}/ConfMainApp.cpp

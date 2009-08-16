@@ -1,5 +1,6 @@
-#include "mainApp.h"
+#include "stable.h"
 
+#include "config.h"
 #include "QtSingleApplication"
 #include "WinMainApp.h"
 
@@ -10,9 +11,11 @@ int main(int argc, char* argv[])
 		return 0;
 
 	qsrand(QDateTime::currentDateTime().toTime_t());
+	app.setApplicationName(qAppName());
+	app.setApplicationVersion(PROJVER);
 
 	QTranslator lang;
-	lang.load(QString(":/lang/"PROJNAME"_%1.qm").arg(QLocale::system().name()));
+	lang.load(QString(":/lang/%1_%2.qm").arg(PROJNAME).arg(QLocale::system().name()));
 	app.installTranslator(&lang);
 
 	QWinMainApp win;

@@ -78,7 +78,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\mainApp.cpp"
+				RelativePath=".\main.cpp"
 				>
 			</File>
 			<File
@@ -125,10 +125,6 @@
 			</File>
 			<File
 				RelativePath="..\src\Debug.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\mainApp.h"
 				>
 			</File>
 			<File
