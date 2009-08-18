@@ -17,8 +17,7 @@ void QWinMainApp::_init()
 	DEWRP(QConfMainApp, conf, m_conf, new QConfMainApp(this));
 	conf.m_mainWidget = this;
 	DECOP(QWallMgr, conf, wallmgr);
-	DECCV(bool, bFirstChangeWallPaper);
-	bFirstChangeWallPaper = false;
+	DEWCV(bool, bFirstChangeWallPaper, false);
 
 	setWindowTitle(QString("%1 %2").arg(qAppName()).arg(qApp->applicationVersion()));
 

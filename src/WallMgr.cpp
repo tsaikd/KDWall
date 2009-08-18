@@ -147,12 +147,13 @@ void QWallCacheMaker::run()
 void QWallMgr::_init()
 {
 	DECCP(QConfMainApp, conf);
+	CDCOV(int, conf, wall_timer_sec);
 
 	m_cacheMaker = new QWallCacheMaker(conf, m_wallList, &m_mutex, parent());
 
 	getWallPaper(m_initWall);
 	m_initWall.m_useOrigin = true;
-	m_timerId = 0;
+	m_timerId = startTimer(wall_timer_sec * 1000);
 }
 
 QWallMgr::~QWallMgr()
