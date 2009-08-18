@@ -1,5 +1,5 @@
 TEMPLATE = app
-TARGET = KDWallApp
+TARGET = KDWall
 
 BASEDIR = $${PWD}/..
 SRCDIR = $${BASEDIR}/src
