@@ -6,8 +6,8 @@
  * Support for IDE msvc2005 msvc2008
  *
  * @author tsaikd@gmail.com
- * @version 1.0.0.5
- * @date 2009/08/12
+ * @version 1.0.0.7
+ * @date 2009/08/18
  **/
 
 #ifndef _GENERAL_DEBUG_H
@@ -183,7 +183,7 @@
 	#define TRACE3(fmt, arg1, arg2, arg3)
 #endif//TRACE3
 #ifndef TRACE4
-	#define TRACE4(fmt, arg1, arg2, arg3, arg4)()
+	#define TRACE4(fmt, arg1, arg2, arg3, arg4)
 #endif//TRACE4
 #ifndef TRACE5
 	#define TRACE5(fmt, arg1, arg2, arg3, arg4, arg5)
@@ -288,50 +288,58 @@
 	#define ZERO_ARR(var) memset(var, 0, sizeof(var));
 #endif//ZERO_ARR
 
-#ifndef DECCV
-	#define DECCV(type, var)			type& var = m_##var					// declare current class variable
+#ifndef DECCV	// declare current class variable
+	#define DECCV(type, var)			type& var = m_##var
 #endif//DECCV
-#ifndef DECCP
-	#define DECCP(type, var)			type& var = *m_##var				// declare current class variable pointer
+#ifndef DECCP	// declare current class variable pointer
+	#define DECCP(type, var)			type& var = *m_##var
 #endif//DECCP
-#ifndef DECOV
-	#define DECOV(type, base, var)		type& var = (base).m_##var			// declare other class variable
+#ifndef DECOV	// declare other class variable
+	#define DECOV(type, base, var)		type& var = (base).m_##var
 #endif//DECOV
-#ifndef DECOP
-	#define DECOP(type, base, var)		type& var = *(base).m_##var			// declare other class variable pointer
+#ifndef DECOP	// declare other class variable pointer
+	#define DECOP(type, base, var)		type& var = *(base).m_##var
 #endif//DECOP
-#ifndef DECRV
-	#define DECRV(type, var, member)	type& var = (member)				// declare renamed variable
+#ifndef DECRV	// declare renamed variable
+	#define DECRV(type, var, member)	type& var = (member)
 #endif//DECRV
-#ifndef DECRP
-	#define DECRP(type, var, member)	type& var = *(member)				// declare renamed variable pointer
+#ifndef DECRP	// declare renamed variable pointer
+	#define DECRP(type, var, member)	type& var = *(member)
 #endif//DECRP
-#ifndef CDCCV
-	#define CDCCV(type, var)			const type& var = m_##var			// declare current class const variable
+#ifndef CDCCV	// declare current class const variable
+	#define CDCCV(type, var)			const type& var = (const type&) m_##var
 #endif//CDCCV
-#ifndef CDCCP
-	#define CDCCP(type, var)			const type& var = *m_##var			// declare current class const variable pointer
+#ifndef CDCCP	// declare current class const variable pointer
+	#define CDCCP(type, var)			const type& var = (const type&) *m_##var
 #endif//CDCCP
-#ifndef CDCOV
-	#define CDCOV(type, base, var)		const type& var = (base).m_##var	// declare other class const variable
+#ifndef CDCOV	// declare other class const variable
+	#define CDCOV(type, base, var)		const type& var = (const type&) (base).m_##var
 #endif//CDCOV
-#ifndef CDCOP
-	#define CDCOP(type, base, var)		const type& var = *(base).m_##var	// declare other class const variable pointer
+#ifndef CDCOP	// declare other class const variable pointer
+	#define CDCOP(type, base, var)		const type& var = (const type&) *(base).m_##var
 #endif//CDCOP
-#ifndef CDCRV
-	#define CDCRV(type, var, member)	const type& var = (member)			// declare renamed variable
+#ifndef CDCRV	// declare renamed variable
+	#define CDCRV(type, var, member)	const type& var = (const type&) (member)
 #endif//CDCRV
-#ifndef CDCRP
-	#define CDCRP(type, var, member)	const type& var = *(member)			// declare renamed variable pointer
+#ifndef CDCRP	// declare renamed variable pointer
+	#define CDCRP(type, var, member)	const type& var = (const type&) *(member)
 #endif//CDCRP
-#ifndef DEWRV
-	// declare and write renamed variable with new value
+#ifndef DEWCV	// declare and write current class variable with new value
+	#define DEWCV(type, var, val) \
+		m_##var = (val); \
+		type& var = m_##var
+#endif//DEWCV
+#ifndef DEWCP	// declare and write current class variable pointer with new value
+	#define DEWCP(type, var, val) \
+		m_##var = (val); \
+		type& var = *m_##var
+#endif//DEWCP
+#ifndef DEWRV	// declare and write renamed variable with new value
 	#define DEWRV(type, var, member, val) \
 		member = (val); \
 		type& var = member
 #endif//DEWRV
-#ifndef DEWRP
-	// declare and write renamed variable pointer with new value
+#ifndef DEWRP	// declare and write renamed variable pointer with new value
 	#define DEWRP(type, var, member, val) \
 		member = (val); \
 		type& var = *member
