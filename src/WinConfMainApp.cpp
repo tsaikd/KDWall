@@ -75,6 +75,7 @@ void QWinConfMainApp::saveConf()
 
 	conf.m_wall_timer_sec = m_wall_timer_sec->text().toInt();
 	conf.m_max_cache_image = m_max_cache_image->text().toInt();
+	conf.m_disable_cache_warning = (m_disable_cache_warning->checkState() == Qt::Checked) ? true : false;
 
 	conf.m_ignoreImageFormatSupportWarning = (m_ignoreImageFormatSupportWarning->checkState() == Qt::Checked) ? true : false;
 	conf.m_picfinder_refresh_msec = m_picfinder_refresh_msec->text().toInt();
