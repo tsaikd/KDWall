@@ -1,21 +1,9 @@
 #include "ConfMainApp.h"
+#include "ExtConfCppInc.h"
 
 #include "DBMgr.h"
 #include "WallMgr.h"
 #include "PicFinder.h"
-
-#define LOAD_CONFIG(var, defvalue) m_##var << conf.value(#var, defvalue); m_mapConfDefValue.insert(#var, defvalue);
-#define SAVE_CONFIG(var) if (m_##var == m_mapConfDefValue.value(#var)) { conf.remove(#var); } else { conf.setValue(#var, m_##var); }
-
-static const QVariant& operator << (bool& val, const QVariant& var) {
-	val = var.toBool();
-	return var;
-}
-
-static const QVariant& operator << (int& val, const QVariant& var) {
-	val = var.toInt();
-	return var;
-}
 
 #ifdef Q_WS_X11
 static const QVariant& operator << (WM& val, const QVariant& var) {
@@ -24,10 +12,14 @@ static const QVariant& operator << (WM& val, const QVariant& var) {
 }
 #endif//Q_WS_X11
 
-void QConfMainApp::_init()
+QConfMainApp::~QConfMainApp()
 {
-	m_conf = new QSettings(PROJNAME".ini", QSettings::IniFormat, this);
-	DECCP(QSettings, conf);
+	save();
+	delete m_desk;
+}
+
+void QConfMainApp::load()
+{
 	m_mainWidget = NULL;
 	m_closing = false;
 	LOAD_CONFIG(initWithoutWindow, "0");
@@ -58,16 +50,8 @@ void QConfMainApp::_init()
 	m_desk = new QDesktopWidget();
 }
 
-QConfMainApp::~QConfMainApp()
+void QConfMainApp::save()
 {
-	save();
-	delete m_desk;
-}
-
-QConfMainApp& QConfMainApp::save()
-{
-	DECCP(QSettings, conf);
-
 	SAVE_CONFIG(initWithoutWindow);
 
 	// QDBMgr
@@ -86,7 +70,7 @@ QConfMainApp& QConfMainApp::save()
 	SAVE_CONFIG(wm);
 #endif//Q_WS_X11
 
-	return *this;
+	Super::save();
 }
 
 #ifdef Q_WS_X11

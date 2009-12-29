@@ -4,7 +4,7 @@
 
 #define PROJNAME "KDWall"
 
-#include "Debug.h"
+#include "ExtDebug.h"
 
 #define QMSGBOX_WARN_CONTROL(isDisable, parent, title, msg) \
 	if (!isDisable) { \

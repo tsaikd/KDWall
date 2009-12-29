@@ -1,7 +1,7 @@
 #ifndef _KDWALL_QCONFMAINAPP_H
 #define _KDWALL_QCONFMAINAPP_H
 
-#include "stable.h"
+#include "ExtConf.h"
 
 class QWallMgr;
 class QPicFinder;
@@ -21,18 +21,18 @@ class QDBMgr;
 	};
 #endif//Q_WS_X11
 
-class QConfMainApp : public QObject
+class QConfMainApp : public QExtConf
 {
-private:
-	void _init();
+	typedef QExtConf Super;
 public:
 	QConfMainApp(QObject* parent = NULL)
-		:	QObject(parent)
-	{ _init(); }
+		:	Super(parent)
+	{ load(); }
 	~QConfMainApp();
-	QConfMainApp& save();
 
-	QSettings* m_conf;
+	void load();
+	void save();
+
 	QWidget* m_mainWidget;
 	bool	m_closing;
 	bool	m_initWithoutWindow;					// ini conf
@@ -58,9 +58,6 @@ public:
 protected:
 	void autoDetectWM();
 #endif//Q_WS_X11
-
-protected:
-	QMap<QString, QVariant> m_mapConfDefValue;
 };
 
 #endif//_KDWALL_QCONFMAINAPP_H

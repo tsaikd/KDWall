@@ -18,7 +18,7 @@ QWallPaperParam& QWallPaperParam::close()
 {
 	if (!m_useOrigin && !m_tmpPath.isEmpty()) {
 		if (!QFile::remove(m_tmpPath)) {
-			QTRACE() << "Remove file" << m_tmpPath << "failed";
+			QTRACE("Remove file" << m_tmpPath << "failed");
 		}
 	}
 
@@ -132,14 +132,14 @@ void QWallCacheMaker::run()
 		{
 			QMutexLocker locker(&m_beMadeWallMutex);
 			wall = beMadeWallList.takeFirst();;
-			QTRACE() << "beMadeWallList:" << beMadeWallList.count();
+			QTRACE("beMadeWallList:" << beMadeWallList.count());
 		}
 		if (!prepareCacheImg(*wall))
 			continue;
 		{
 			QMutexLocker locker(m_wallMutex);
 			wallList.append(wall);
-			QTRACE() << "wallList:" << wallList.count();
+			QTRACE("wallList:" << wallList.count());
 		}
 	}
 }

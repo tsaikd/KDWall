@@ -27,9 +27,9 @@
 				BuildCommandLine="qmake &amp;&amp; nmake debug"
 				ReBuildCommandLine="qmake &amp;&amp; nmake debug-clean debug"
 				CleanCommandLine="nmake debug-clean"
-				Output="KDWallAppd.exe"
+				Output="KDWalld.exe"
 				PreprocessorDefinitions="WIN32;_DEBUG;QT_VERSION;Q_WS_WIN"
-				IncludeSearchPath=""
+				IncludeSearchPath="..\exLib\CppExtLib\src;..\exLib\QtExtLib\src"
 				ForcedIncludes=""
 				AssemblySearchPath=""
 				ForcedUsingAssemblies=""
@@ -47,9 +47,9 @@
 				BuildCommandLine="qmake &amp;&amp; nmake release"
 				ReBuildCommandLine="qmake &amp;&amp; nmake release-clean release"
 				CleanCommandLine="nmake release-clean"
-				Output="KDWallApp.exe"
+				Output="KDWall.exe"
 				PreprocessorDefinitions="WIN32;NDEBUG;QT_VERSION;Q_WS_WIN"
-				IncludeSearchPath=""
+				IncludeSearchPath="..\exLib\CppExtLib\src;..\exLib\QtExtLib\src"
 				ForcedIncludes=""
 				AssemblySearchPath=""
 				ForcedUsingAssemblies=""
@@ -71,10 +71,6 @@
 			</File>
 			<File
 				RelativePath="..\src\DBMgr.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\Debug.cpp"
 				>
 			</File>
 			<File
@@ -105,6 +101,14 @@
 				RelativePath="..\src\WinMainApp.cpp"
 				>
 			</File>
+			<Filter
+				Name="CppExtLib"
+				>
+				<File
+					RelativePath="..\exLib\CppExtLib\src\ExtDebug.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -121,10 +125,6 @@
 			</File>
 			<File
 				RelativePath="..\src\DBMgr.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\Debug.h"
 				>
 			</File>
 			<File
@@ -155,6 +155,26 @@
 				RelativePath="..\src\WinMainApp.h"
 				>
 			</File>
+			<Filter
+				Name="CppExtLib"
+				>
+				<File
+					RelativePath="..\exLib\CppExtLib\src\ExtDebug.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="QtExtLib"
+				>
+				<File
+					RelativePath="..\exLib\QtExtLib\src\ExtConf.h"
+					>
+				</File>
+				<File
+					RelativePath="..\exLib\QtExtLib\src\ExtConfCppInc.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"

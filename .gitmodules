@@ -1,0 +1,6 @@
+[submodule "exLib/CppExtLib"]
+	path = exLib/CppExtLib
+	url = http://www.tsaikd.org/git/CppExtLib.git
+[submodule "exLib/QtExtLib"]
+	path = exLib/QtExtLib
+	url = http://www.tsaikd.org/git/QtExtLib.git

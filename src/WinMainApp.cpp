@@ -164,8 +164,7 @@ void QWinMainApp::closeEvent(QCloseEvent* e)
 
 	picfinder.quit();
 	if (!picfinder.wait(10000)) {
-		qWarning() << "Q" << "Z";
-		QTRACE() << "PicFinder wait timeout";
+		QTRACE("PicFinder wait timeout");
 		picfinder.exit(1);
 	}
 
@@ -177,7 +176,7 @@ void QWinMainApp::changeEvent(QEvent* e)
 	if (e->type() == QEvent::WindowStateChange) {
 		if (e->spontaneous()) {
 			QWindowStateChangeEvent* e1 = (QWindowStateChangeEvent*)e;
-			QTRACE() << e1->oldState();
+			QTRACE(e1->oldState());
 			DECCP(QSystemTrayIcon, tray);
 			if (isMinimized()) {
 				m_rect = geometry();
@@ -200,7 +199,8 @@ void QWinMainApp::handleAppMessage(const QString& sMsg)
 		activateWindow();
 		break;
 	default:
-		QTRACE() << "Unknown APPMSG:" << sMsg;
+		QTRACE("Unknown APPMSG:" << sMsg);
+		break;
 	}
 }
 

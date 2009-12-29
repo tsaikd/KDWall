@@ -103,7 +103,7 @@ void QPicFinder::run()
 
 				const QFileInfo& fi = fiDirList[i];
 				dirs.append(QDir(fi.absoluteFilePath()));
-				QTRACE() << "DIR" << fi.absoluteFilePath();
+				QTRACE("DIR" << fi.absoluteFilePath());
 			}
 
 			dir.setNameFilters(dirNameFilters);
@@ -119,7 +119,7 @@ void QPicFinder::run()
 					emit(dirFoundSome(sDir));
 					time = QTime::currentTime();
 				}
-				QTRACE() << fi.absoluteFilePath();
+				QTRACE(fi.absoluteFilePath());
 			}
 		}
 

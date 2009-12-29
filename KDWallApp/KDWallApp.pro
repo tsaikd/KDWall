@@ -19,8 +19,14 @@ RC_FILE = KDWallApp.rc
 INCLUDEPATH += $${SRCDIR}
 PRECOMPILED_HEADER += $${SRCDIR}/stable.h
 
+# CppExtLib
+INCLUDEPATH *= ../exLib/CppExtLib/src
+SOURCES += ../exLib/CppExtLib/src/ExtDebug.cpp
+
+# QtExtLib
+include(../exLib/QtExtLib/gui.pri)
+
 SOURCES += main.cpp
-SOURCES += $${SRCDIR}/Debug.cpp
 HEADERS += $${SRCDIR}/WinMainApp.h
 SOURCES += $${SRCDIR}/WinMainApp.cpp
 SOURCES += $${SRCDIR}/ConfMainApp.cpp

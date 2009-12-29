@@ -62,7 +62,7 @@ int QDBMgr::getPicCount()
 			return sql.value(0).toInt();
 		}
 	} else {
-		QTRACE() << sql.lastError().text();
+		QTRACE(sql.lastError().text());
 	}
 	return 0;
 }
@@ -88,7 +88,7 @@ QString QDBMgr::getRandPic()
 				path = sql.value(0).toString();
 			}
 		} else {
-			QTRACE() << sql.lastError().text();
+			QTRACE(sql.lastError().text());
 		}
 	} while (pichist.contains(path) && (--retry > 0));
 
@@ -120,12 +120,12 @@ QDBMgr& QDBMgr::rmDir(const QString& path)
 	sql.prepare("DELETE FROM dirlist WHERE path = ?;");
 	sql.addBindValue(path);
 	if (!sql.exec()) {
-		QTRACE() << sql.lastError().text();
+		QTRACE(sql.lastError().text());
 	}
 	sql.prepare("DELETE FROM piclist WHERE dir = ?;");
 	sql.addBindValue(path);
 	if (!sql.exec()) {
-		QTRACE() << sql.lastError().text();
+		QTRACE(sql.lastError().text());
 	}
 	QSqlQuery("VACUUM;");
 	return *this;
@@ -143,7 +143,7 @@ bool QDBMgr::dirEnable(const QString& path)
 			}
 		}
 	} else {
-		QTRACE() << sql.lastError().text();
+		QTRACE(sql.lastError().text());
 	}
 	return false;
 }
@@ -155,7 +155,7 @@ QDBMgr& QDBMgr::setDirEnable(const QString& path, bool enable)
 	sql.addBindValue(enable ? "1" : "0");
 	sql.addBindValue(path);
 	if (!sql.exec()) {
-		QTRACE() << sql.lastError().text();
+		QTRACE(sql.lastError().text());
 	}
 	return *this;
 }
@@ -172,7 +172,7 @@ bool QDBMgr::isDirExists(const QString& path)
 			}
 		}
 	} else {
-		QTRACE() << sql.lastError().text();
+		QTRACE(sql.lastError().text());
 	}
 	return false;
 }
@@ -187,7 +187,7 @@ int QDBMgr::getDirPicCount(const QString& path)
 			return sql.value(0).toInt();
 		}
 	} else {
-		QTRACE() << sql.lastError().text();
+		QTRACE(sql.lastError().text());
 	}
 	return 0;
 }
@@ -202,7 +202,7 @@ QStringList QDBMgr::getDirList()
 			res << sql.value(0).toString();
 		}
 	} else {
-		QTRACE() << sql.lastError().text();
+		QTRACE(sql.lastError().text());
 	}
 
 	return res;
