@@ -9,6 +9,11 @@ void QWinConfMainApp::_init()
 
 	setWindowFlags(windowFlags() | Qt::Window);
 
+	QAction* act = new QAction(this);
+	act->setShortcut(Qt::Key_Escape);
+	addAction(act);
+	connect(act, SIGNAL(triggered()), this, SLOT(close()));
+
 	QVBoxLayout* lot = new QVBoxLayout();
 	{
 		newWinConfBool(&conf.m_initWithoutWindow, m_initWithoutWindow, tr("Start without window"), lot);
@@ -18,6 +23,7 @@ void QWinConfMainApp::_init()
 		newWinConfInt(&conf.m_wall_timer_sec, m_wall_timer_sec, tr("Wallpaper change timer (second)"), lot);
 		newWinConfInt(&conf.m_max_cache_image, m_max_cache_image, tr("Cache image max number"), lot);
 		newWinConfBool(&conf.m_disable_cache_warning, m_disable_cache_warning, tr("Disable cache warning"), lot);
+		newWinConfBool(&conf.m_still_run_when_fullscreen, m_still_run_when_fullscreen, tr("Still run when fullscreen"), lot);
 
 		newWinConfBool(&conf.m_ignoreImageFormatSupportWarning, m_ignoreImageFormatSupportWarning, tr("Ignore image format support warning"), lot);
 		newWinConfInt(&conf.m_picfinder_refresh_msec, m_picfinder_refresh_msec, tr("Picture finder refresh timer (msec)"), lot);
@@ -76,6 +82,7 @@ void QWinConfMainApp::saveConf()
 	conf.m_wall_timer_sec = m_wall_timer_sec->text().toInt();
 	conf.m_max_cache_image = m_max_cache_image->text().toInt();
 	conf.m_disable_cache_warning = (m_disable_cache_warning->checkState() == Qt::Checked) ? true : false;
+	conf.m_still_run_when_fullscreen = (m_still_run_when_fullscreen->checkState() == Qt::Checked) ? true : false;
 
 	conf.m_ignoreImageFormatSupportWarning = (m_ignoreImageFormatSupportWarning->checkState() == Qt::Checked) ? true : false;
 	conf.m_picfinder_refresh_msec = m_picfinder_refresh_msec->text().toInt();

@@ -372,7 +372,7 @@ bool QWallMgr::setRandWallPaper()
 	QString path;
 	int retry;
 
-	if (!QUtil::isDesktopVisible())
+	if (!conf.m_still_run_when_fullscreen && !QUtil::isDesktopVisible())
 		return false;
 
 	if (timerId) {

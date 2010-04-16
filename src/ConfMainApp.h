@@ -44,6 +44,7 @@ public:
 	int		m_wall_timer_sec;						// ini conf
 	int		m_max_cache_image;						// ini conf
 	bool	m_disable_cache_warning;				// ini conf
+	bool	m_still_run_when_fullscreen;			// ini conf
 
 	QPicFinder* m_picfinder;
 	bool	m_closingPicfinder;

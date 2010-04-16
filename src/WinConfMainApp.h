@@ -32,6 +32,7 @@ protected:
 	QLineEdit* m_wall_timer_sec;
 	QLineEdit* m_max_cache_image;
 	QCheckBox* m_disable_cache_warning;
+	QCheckBox* m_still_run_when_fullscreen;
 
 	QCheckBox* m_ignoreImageFormatSupportWarning;
 	QLineEdit* m_picfinder_refresh_msec;
