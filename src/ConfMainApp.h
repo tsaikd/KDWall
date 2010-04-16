@@ -1,6 +1,7 @@
 #ifndef _KDWALL_QCONFMAINAPP_H
 #define _KDWALL_QCONFMAINAPP_H
 
+#include "stable.h"
 #include "ExtConf.h"
 
 class QWallMgr;

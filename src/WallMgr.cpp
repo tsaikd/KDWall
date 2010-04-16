@@ -211,7 +211,7 @@ bool QWallMgr::getWallPaper(QWallPaperParam& wall)
 				procout = procout.trimmed();
 				wall.m_path = procout;
 			} else {
-				QTRACE() << proc.errorString();
+				QTRACE(proc.errorString());
 				return false;
 			}
 		}
@@ -231,7 +231,7 @@ bool QWallMgr::getWallPaper(QWallPaperParam& wall)
 					return false;
 				}
 			} else {
-				QTRACE() << proc.errorString();
+				QTRACE(proc.errorString());
 				return false;
 			}
 		}
