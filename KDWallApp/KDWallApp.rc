@@ -28,7 +28,7 @@ VS_VERSION_INFO VERSIONINFO
 				VALUE "CompanyName", "KD\0"
 				VALUE "FileDescription", "KDWall Qt Application\0"
 				VALUE "FileVersion", PROJVER
-				VALUE "LegalCopyright", "Copyright (C) 2009 by tsaikd\0"
+				VALUE "LegalCopyright", "Copyright (C) 2009-2010 by tsaikd@gmail.com\0"
 				VALUE "ProductVersion", PROJVER
 				VALUE "ProductName", PROJNAME
 			END
