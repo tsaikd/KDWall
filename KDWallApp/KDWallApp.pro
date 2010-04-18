@@ -14,17 +14,13 @@ win32 {
 
 TRANSLATIONS += $${LANGDIR}/KDWall_zh_TW.ts
 RESOURCES += $${BASEDIR}/KDWall.qrc
-RC_FILE = KDWallApp.rc
+RC_FILE = $${PWD}/KDWallApp.rc
 
 INCLUDEPATH += $${SRCDIR}
 PRECOMPILED_HEADER += $${SRCDIR}/stable.h
 
-# CppExtLib
-INCLUDEPATH *= ../exLib/CppExtLib/src
-SOURCES += ../exLib/CppExtLib/src/ExtDebug.cpp
-
 # QtExtLib
-include(../exLib/QtExtLib/gui.pri)
+include($${BASEDIR}/exLib/QtExtLib/gui.pri)
 
 SOURCES += main.cpp
 HEADERS += $${SRCDIR}/WinMainApp.h
@@ -41,5 +37,7 @@ SOURCES += $${SRCDIR}/PicFinder.cpp
 HEADERS += $${SRCDIR}/TreePicDir.h
 SOURCES += $${SRCDIR}/TreePicDir.cpp
 
-include($${INCDIR}/qtsingleapplication/qtsingleapplication.pri)
-include($${BASEDIR}/general.pri)
+DEFINES *= CPPEXTLIB_NOLINKLIB
+include($${BASEDIR}/exLib/CppExtLib/CppExtLib.pri)
+include($${INCDIR}/qtsingleapplication-2.6_1-opensource/src/qtsingleapplication.pri)
+include($${BASEDIR}/exLib/QtExtLib/general.pri)
