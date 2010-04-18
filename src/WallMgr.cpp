@@ -91,16 +91,38 @@ bool QWallCacheMaker::prepareCacheImg(QWallPaperParam& wall)
 			return false;
 		}
 
+		QRect rcDesk = desk.geometry();
+		switch (conf.m_wall_resize_policy) {
+		case WALL_RESIZE_POLICY_MAX_SCREEN:
+			for (int i=0 ; i<desk.screenCount() ; i++) {
+				const QRect& rc = desk.screenGeometry(i);
+				if (rc.width() * rc.height() > rcDesk.width() * rcDesk.height()) {
+					rcDesk = rc;
+				}
+			}
+			break;
+		case WALL_RESIZE_POLICY_MIN_SCREEN:
+			for (int i=0 ; i<desk.screenCount() ; i++) {
+				const QRect& rc = desk.screenGeometry(i);
+				if (rc.width() * rc.height() < rcDesk.width() * rcDesk.height()) {
+					rcDesk = rc;
+				}
+			}
+			break;
+		default:
+			break;
+		}
+
 		tmpPath = QDir::toNativeSeparators(tmp.fileName());
 		if (!img.load(path)) {
 			QMSGBOX_WARN_CONTROL(disable_cache_warning, mainWidget, PROJNAME, tr("Load image failed ('%1')").arg(path));
 			return false;
 		}
-		if (img.height() > desk.height()) {
-			img = img.scaledToHeight(desk.height(), Qt::SmoothTransformation);
+		if (img.height() > rcDesk.height()) {
+			img = img.scaledToHeight(rcDesk.height(), Qt::SmoothTransformation);
 		}
-		if (img.width() > desk.width()) {
-			img = img.scaledToWidth(desk.width(), Qt::SmoothTransformation);
+		if (img.width() > rcDesk.width()) {
+			img = img.scaledToWidth(rcDesk.width(), Qt::SmoothTransformation);
 		}
 		if (!img.save(tmpPath, "BMP")) {
 			QMSGBOX_WARN_CONTROL(disable_cache_warning, mainWidget, PROJNAME, tr("Save image to BMP failed ('%1')").arg(tmpPath));

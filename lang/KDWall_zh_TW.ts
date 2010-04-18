@@ -4,15 +4,14 @@
 <context>
     <name></name>
     <message>
-        <location filename="../src/PicFinder.cpp" line="12"/>
         <source>System does not support image format %1</source>
-        <translation>系統不支援 %1 影像格式</translation>
+        <translation type="obsolete">系統不支援 %1 影像格式</translation>
     </message>
 </context>
 <context>
     <name>QConfMainApp</name>
     <message>
-        <location filename="../src/ConfMainApp.cpp" line="114"/>
+        <location filename="../src/ConfMainApp.cpp" line="116"/>
         <source>Window Manager auto detect failed</source>
         <translation>視窗管理員自動偵測失敗</translation>
     </message>
@@ -38,12 +37,12 @@
         <translation>建立暫存檔失敗</translation>
     </message>
     <message>
-        <location filename="../src/WallMgr.cpp" line="96"/>
+        <location filename="../src/WallMgr.cpp" line="118"/>
         <source>Load image failed (&apos;%1&apos;)</source>
         <translation>讀取影像檔失敗 (&apos;%1&apos;)</translation>
     </message>
     <message>
-        <location filename="../src/WallMgr.cpp" line="106"/>
+        <location filename="../src/WallMgr.cpp" line="128"/>
         <source>Save image to BMP failed (&apos;%1&apos;)</source>
         <translation>儲存 BMP 影像檔失敗 (&apos;%1&apos;)</translation>
     </message>
@@ -51,52 +50,72 @@
 <context>
     <name>QWinConfMainApp</name>
     <message>
-        <location filename="../src/WinConfMainApp.cpp" line="14"/>
+        <location filename="../src/WinConfMainApp.cpp" line="19"/>
         <source>Start without window</source>
         <translation>啟動時隱藏視窗</translation>
     </message>
     <message>
-        <location filename="../src/WinConfMainApp.cpp" line="16"/>
+        <location filename="../src/WinConfMainApp.cpp" line="21"/>
         <source>Picture history max number</source>
         <translation>影像歷史最大數量</translation>
     </message>
     <message>
-        <location filename="../src/WinConfMainApp.cpp" line="18"/>
+        <location filename="../src/WinConfMainApp.cpp" line="23"/>
         <source>Wallpaper change timer (second)</source>
         <translation>更換背景時間間隔 (秒)</translation>
     </message>
     <message>
-        <location filename="../src/WinConfMainApp.cpp" line="19"/>
+        <location filename="../src/WinConfMainApp.cpp" line="24"/>
         <source>Cache image max number</source>
         <translation>快取影像最大數量</translation>
     </message>
     <message>
-        <location filename="../src/WinConfMainApp.cpp" line="20"/>
+        <location filename="../src/WinConfMainApp.cpp" line="25"/>
         <source>Disable cache warning</source>
         <translation>取消快取警告訊息</translation>
     </message>
     <message>
-        <location filename="../src/WinConfMainApp.cpp" line="21"/>
+        <location filename="../src/WinConfMainApp.cpp" line="26"/>
         <source>Still run when fullscreen</source>
         <translation>在全螢幕模式中仍然繼續執行</translation>
     </message>
     <message>
-        <location filename="../src/WinConfMainApp.cpp" line="23"/>
+        <location filename="../src/WinConfMainApp.cpp" line="29"/>
+        <source>Default Screen</source>
+        <translation>預設的螢幕大小</translation>
+    </message>
+    <message>
+        <location filename="../src/WinConfMainApp.cpp" line="30"/>
+        <source>Minimium Screen</source>
+        <translation>最小的螢幕大小</translation>
+    </message>
+    <message>
+        <location filename="../src/WinConfMainApp.cpp" line="31"/>
+        <source>Maximium Screen</source>
+        <translation>最大的螢幕大小</translation>
+    </message>
+    <message>
+        <location filename="../src/WinConfMainApp.cpp" line="32"/>
+        <source>Wallpager resize policy</source>
+        <translation>桌布改變大小的依據</translation>
+    </message>
+    <message>
+        <location filename="../src/WinConfMainApp.cpp" line="35"/>
         <source>Ignore image format support warning</source>
         <translation>忽略支援影像格式的警告</translation>
     </message>
     <message>
-        <location filename="../src/WinConfMainApp.cpp" line="24"/>
+        <location filename="../src/WinConfMainApp.cpp" line="36"/>
         <source>Picture finder refresh timer (msec)</source>
         <translation>影像搜尋器的更新時間 (毫秒)</translation>
     </message>
     <message>
-        <location filename="../src/WinConfMainApp.cpp" line="30"/>
+        <location filename="../src/WinConfMainApp.cpp" line="42"/>
         <source>&amp;Ok</source>
         <translation>確定(&amp;O)</translation>
     </message>
     <message>
-        <location filename="../src/WinConfMainApp.cpp" line="36"/>
+        <location filename="../src/WinConfMainApp.cpp" line="48"/>
         <source>&amp;Cancel</source>
         <translation>取消(&amp;C)</translation>
     </message>

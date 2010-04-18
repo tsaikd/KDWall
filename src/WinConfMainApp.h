@@ -18,6 +18,7 @@ public:
 protected:
 	void newWinConfBool(bool* var, QCheckBox*& chk, const QString& text, QLayout* lot);
 	void newWinConfInt(int* var, QLineEdit*& edt, const QString& text, QVBoxLayout* lot);
+	void newWinConfEnum(int* var, QComboBox*& cbo, const QString& text, const QMap<int, QString>& vals, QVBoxLayout* lot);
 
 protected slots:
 	void saveConf();
@@ -33,6 +34,7 @@ protected:
 	QLineEdit* m_max_cache_image;
 	QCheckBox* m_disable_cache_warning;
 	QCheckBox* m_still_run_when_fullscreen;
+	QComboBox* m_wall_resize_policy;
 
 	QCheckBox* m_ignoreImageFormatSupportWarning;
 	QLineEdit* m_picfinder_refresh_msec;

@@ -32,6 +32,7 @@ void QConfMainApp::load()
 	LOAD_CONFIG(max_cache_image, "5");
 	LOAD_CONFIG(disable_cache_warning, "0");
 	LOAD_CONFIG(still_run_when_fullscreen, "0");
+	LOAD_CONFIG(wall_resize_policy, "0");
 
 	// QPicFinder
 	m_closingPicfinder = false;
@@ -63,6 +64,7 @@ void QConfMainApp::save()
 	SAVE_CONFIG(max_cache_image);
 	SAVE_CONFIG(disable_cache_warning);
 	SAVE_CONFIG(still_run_when_fullscreen);
+	SAVE_CONFIG(wall_resize_policy);
 
 	// QPicFinder
 	SAVE_CONFIG(picfinder_refresh_msec);

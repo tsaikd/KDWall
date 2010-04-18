@@ -22,6 +22,12 @@ class QDBMgr;
 	};
 #endif//Q_WS_X11
 
+typedef enum _WALL_RESIZE_POLICY {
+	WALL_RESIZE_POLICY_DEFAULT_SCREEN,
+	WALL_RESIZE_POLICY_MIN_SCREEN,
+	WALL_RESIZE_POLICY_MAX_SCREEN,
+} WALL_RESIZE_POLICY;
+
 class QConfMainApp : public QExtConf
 {
 	typedef QExtConf Super;
@@ -46,6 +52,7 @@ public:
 	int		m_max_cache_image;						// ini conf
 	bool	m_disable_cache_warning;				// ini conf
 	bool	m_still_run_when_fullscreen;			// ini conf
+	int		m_wall_resize_policy;					// ini conf
 
 	QPicFinder* m_picfinder;
 	bool	m_closingPicfinder;
