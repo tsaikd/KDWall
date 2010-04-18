@@ -94,7 +94,7 @@ bool QWallCacheMaker::prepareCacheImg(QWallPaperParam& wall)
 		QRect rcDesk = desk.geometry();
 		switch (conf.m_wall_resize_policy) {
 		case WALL_RESIZE_POLICY_MAX_SCREEN:
-			for (int i=0 ; i<desk.screenCount() ; i++) {
+			for (int i=0 ; i<desk.numScreens() ; i++) {
 				const QRect& rc = desk.screenGeometry(i);
 				if (rc.width() * rc.height() > rcDesk.width() * rcDesk.height()) {
 					rcDesk = rc;
@@ -102,7 +102,7 @@ bool QWallCacheMaker::prepareCacheImg(QWallPaperParam& wall)
 			}
 			break;
 		case WALL_RESIZE_POLICY_MIN_SCREEN:
-			for (int i=0 ; i<desk.screenCount() ; i++) {
+			for (int i=0 ; i<desk.numScreens() ; i++) {
 				const QRect& rc = desk.screenGeometry(i);
 				if (rc.width() * rc.height() < rcDesk.width() * rcDesk.height()) {
 					rcDesk = rc;
